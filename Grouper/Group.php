@@ -1,15 +1,15 @@
 <?php
 /**
  * A grouped collection.
- *
+ * TODOs
+ *   - Rename nodes to 'Elements'
  */
-namespace Grouper;
-Group;
+namespace ArrayGrouper\Grouper;
 
-
+use ArrayGrouper\Exception\GroupingException;
 use Countable;
 
-class ShowtimesGroup implements \Countable
+class Group implements \Countable
 {
     const ROOT = 1;
     const GROUP = 2;
@@ -23,8 +23,9 @@ class ShowtimesGroup implements \Countable
     private $caption = '';
     private $key;
     private $parent;
+    private static $fns = array();
 
-    /** tries to get the n-th-child. n starts at 0. */
+    /** tries to get the nth-child. n starts at 0. */
     public function get($n)
     {
         $count = 0;
@@ -49,9 +50,7 @@ class ShowtimesGroup implements \Countable
     public function __construct($caption, $fields, $type = self::GROUP)
     {
         $this->caption = $caption;
-        $this->addAllowedGetters($fields);
         $this->type = $type;
-        self::$allowedFields[$caption] = $fields; // static access for speed.
     }
 
     public function isRoot()
@@ -74,6 +73,7 @@ class ShowtimesGroup implements \Countable
         if ($this->sorted) {
             return;
         }
+
         $this->sorted = true;
         $sort = array();
         foreach ($this->children as $child) {
@@ -122,11 +122,24 @@ class ShowtimesGroup implements \Countable
         $this->orderBys = array_merge($this->orderBys, $orderBys);
     }
 
-
-    public function getChildren()
+    /**
+     * Gets the children of this group.
+     * @param bool $internal wether or not its a call for internal use when constructing the group. Because we do not want
+     * to set the the whole EntityContainer on each internal call.
+     *
+     * @return array|EntityContainer
+     */
+    public function getChildren($internal = false)
     {
+        if (!$this->orderBys) {
+        } else {
+            $this->orderBy($this->orderBys, null);
+            $this->orderBys = null;
+        }
+
         return $this->children;
     }
+
 
     public function count()
     {
@@ -146,7 +159,7 @@ class ShowtimesGroup implements \Countable
     /**
      * getNode returns the _first_ node of a group, allowing querying group properties from it.
      * E.g if the group is grouped by title, group->getTitle() is allowed.
-     * @return Show.
+     * @return data.
      */
     public function getNode()
     {
@@ -155,7 +168,7 @@ class ShowtimesGroup implements \Countable
             return $this->children[0];
         } else if (($this->children)) {
 
-            return $this->children[0]->getShow();
+            return $this->children[0]->getNode();
         }
 
         return null;
@@ -170,7 +183,7 @@ class ShowtimesGroup implements \Countable
     {
         if ($this->isLeaf()) {
             return $this;
-        } else {
+        } else if ($this->children){
             $leaf = $this->children[0]->getLeaf();
             return $leaf;
         }
@@ -179,37 +192,47 @@ class ShowtimesGroup implements \Countable
     /**
      * Gets a caption which replaces placeholders with the current group field values.
      * E.g '%title% in %city%' will replace that string by e.g. 'Gone Girl in Zürich' if we grouped by title and cities,
-     * and are in a group which allows to access title / city on parent.
      * @param $stringWithPlaceholders
      */
     public function formatCaption($stringWithPlaceholders)
     {
         $replacements = $stringWithPlaceholders;
-        $allFields = $this->getAllAllowedFields();
-        foreach ($allFields as $field) {
-            if (strpos('%' . $field . '%', $replacements) !== false) {
-                $fn = 'get' . ucfirst($field);
-                $value = $this->{$fn}();
-                $replacements = str_replace('%' . $field . '%', $value, $replacements);
-            }
+        $pattern = '/%([a-z]++)%/i';
+        $hasFn = count(self::$fns);
+        $matches = array();
+        preg_match_all($pattern, $stringWithPlaceholders, $matches);
+        foreach ($matches[0] as $i => $field) {
+            $node = $this->getNode();
+            $value = $this->getField($node, $matches[1][$i]);
+            $replacements = str_replace($field, $value, $replacements);
         }
 
-        return strpos($replacements, '%') !== false ? preg_replace('/%(.)++%/', '', $replacements) : $replacements;
+        return strpos($replacements, '%') !== false ? preg_replace('/%()++%/', '', $replacements) : $replacements;
+    }
+
+    public function registerFunctions($fns)
+    {
+        self::$fns = $fns;
     }
 
     public function __call($name, $args)
     {
+        if (isset(self::$fns[$name]))
+        {
+            return call_user_func_array(self::$fns[$name], array_merge(array($this->getNode(), $args)));
+        }
+
         if ($this->isLeaf()) {
-            // if we have the method defined here, call it. call it otherwise on the data.
             if (method_exists($this->getNode(), $name)) {
                 return call_user_func_array(array($this->getNode(), $name), $args);
             }  elseif ($this->children) {
-
+                // call it on the first child.
                 return call_user_func_array(array($this->children[0], $name), $args);
             }
         }
+        $leaf = $this->getLeaf();
 
-        return call_user_func_array(array($this->getLeaf(true), $name), $args);
+        return call_user_func_array(array($leaf, $name), $args);
     }
 
     public function __toString()
@@ -227,10 +250,20 @@ class ShowtimesGroup implements \Countable
         return $string;
     }
 
+    /**
+     * Returns the value of this field.
+     * @param $field
+     */
+    public function getValue($field)
+    {
+        return $this->getField($this->getNode(), $field);
+    }
+
+
     public function toString($child)
     {
         $string = "";
-        if ($child instanceof ShowtimesGroup) {
+        if ($child instanceof Group) {
 
             $string .= $child->__toString();
             return $string . $this->toString($child->getChildren(true));
@@ -240,16 +273,16 @@ class ShowtimesGroup implements \Countable
     }
 
     /**
-     * Get shows returns all shows ordered by the the group order.
+     * Get shows returns all data ordered by the the group order.
      */
     public function getNodes()
     {
-        // start retrieval of nodes.
+        // start it.
         return $this->retrieveNodes();
     }
 
     /**
-     * Returns all leaves as a flat array, order by group order.
+     * Returns all nodes as a flat array, order by group order.
      * @return array
      */
     protected function retrieveNodes()
@@ -259,12 +292,11 @@ class ShowtimesGroup implements \Countable
         foreach ($children as $showOrGroup) {
             if (is_scalar($showOrGroup)) {
                 $data[] = $showOrGroup;
-
-            } elseif ($showOrGroup->getId()) {
-                $data[] = $showOrGroup;
+            } elseif (is_object($showOrGroup) && get_class($showOrGroup) === 'Group') {
+                $merge = $showOrGroup->retrieveNodes();
+                $data = array_merge($data, $merge); // merge nodes
             } else {
-                $merge = $showOrGroup->retrieveShows();
-                $data = array_merge($data, $merge);
+                $data[] = $showOrGroup;
             }
         }
 
@@ -281,61 +313,59 @@ class ShowtimesGroup implements \Countable
     {
         $key = '';
         foreach ($keys as $orderBy) {
-            if ($orderBy == 'date') {
-                $key .= $show->getStartTime()->format('Y-m-d') . '-';
-            } elseif ($orderBy == 'time') {
-                $key .= $show->getStartTime()->format('H:i') . '-';
-            } elseif ($orderBy == 'movieTitle') {
-                $key .= $show->getMovie() ? $show->getMovie()->getTitle() : $show->getTitle();
-
-            } else {
-                $method = 'get' . ucfirst($orderBy);
-                $key .= $this->toString($show->$method()) . '-';
-            }
+            $method =$this->getField($orderBy);
+            $key .= $this->toString($show->$method()) . '-';
         }
+
         return $key;
     }
 
     protected function asString($var)
     {
         if (!$var) {
-            return '';
 
+            return '';
         } elseif (is_scalar($var)) {
             return $var;
 
         } elseif (is_object($var)) {
             if (method_exists($var, 'getName')) {
+
                 return $var->getName();
             } elseif (method_exists($var, 'getId')) {
+
                 return $var->getId() . ',';
             } elseif (get_class($var) === 'Date' || get_class($var) === 'DateTime') {
+
                 return $var->format('Y-m-d H:i:s');
             } else {
-                throw new CinergyCommonException("Could not resolve var: " . get_class($var));
+                throw new GroupingException("Could not resolve var: " . get_class($var));
             }
-
         } elseif (is_array($var)) {
             // stop recursive displaying array values, use * instead..
             return '[' . str_repeat('*,', count($var)) . ']';
         }
 
-        throw new CinergyCommonException("Could not convert to string value: " . gettype($var) . is_object($var) ? get_class($var) : '');
+        throw new GroupingException("Could not convert to string value: " . gettype($var) . is_object($var) ? get_class($var) : '');
     }
 
     /**
-     * Returns all fields which are allowed to call.
-     * @return array
+     * Tries to get the 'field' from a group or a raw element.
+     * If a group has registered functions on it, it accesses them as well.
+     * @param $ojbOrArr
+     * @param $field
+     * @return mixed
      */
-    private function getAllAllowedFields()
+    private function getField($ojbOrArr, $field)
     {
-
-        $fields = self::$allowedFields[$this->caption];
-        $parent = $this;
-        while (($parent = $parent->parent)) {
-            $fields = array_merge($fields, self::$allowedFields[$parent->caption]);
+        if (is_object($ojbOrArr)) {
+            $getter = 'get' . ucfirst($field);
+            return $ojbOrArr->{$getter}();
+        } elseif (is_array($ojbOrArr) && isset($ojbOrArr[$field])) {
+            return $ojbOrArr[$field];
+        } elseif(isset(self::$fns[$field])) {
+            $call = self::$fns[$field];
+            return $call($ojbOrArr);
         }
-
-        return array_merge(self::$allowedMethods, $fields);
     }
 }
