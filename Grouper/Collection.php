@@ -8,6 +8,7 @@
 
 namespace ArrayGrouper\Grouper;
 use ArrayGrouper\Exception\GroupingException;
+use ArrayGrouper\Grouper\GroupExtensions;
 use ArrayGrouper\Grouper\Group;
 /**
  * This class allows to group a list of data.
@@ -85,6 +86,7 @@ class Collection
         $groupings = $this->groupIt($this->data, $this->groupings);
         // function can be evaluated by groups as well if they call it.
         $groupings->registerFunctions($this->fns);
+        $groupings->registerExtension(new GroupExtensions());
         return $this->result = $groupings;
     }
 
@@ -114,9 +116,9 @@ class Collection
 
             if (isset($this->fns[$orderBy] )) {
                 // do we have a custom registered grouping fn?
-                $key .= $this->fns[$orderBy]($data) . '-';
+                $key .= '-' . $this->fns[$orderBy]($data);
             } elseif (is_array($data)) {
-                $key .= $data[$orderBy];
+                $key .= '-' . $data[$orderBy] ?: '0';
             } elseif (is_object($data)) {
                 $method = 'get' . ucfirst($orderBy);
                 $key .= $this->toString($data->$method()) . '-';
@@ -155,8 +157,7 @@ class Collection
     }
 
     /**
-     * Takes a flat array as input, and groups it recursively, taking subgroups into account.
-     *
+     * Takes a flat array as input, and groups it recursively.
      * @param $structure array $data.
      * @param $groupArray The groups array. E.g array('first' => array('title'), 'second' => array('date', 'time'))
      * @return ShowtimesGroup A grouped tree.
@@ -195,6 +196,8 @@ class Collection
                 $c->setKey($key);
             }
         } else {
+
+
             // No group criteria left, create leave node.
             foreach ($groupings as $key => $g) {
                 $child = new Group(implode('-',$groupValues), $groupValues, Group::LEAF);

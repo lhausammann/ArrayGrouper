@@ -25,6 +25,8 @@ class Group implements \Countable
     private $parent;
     private static $fns = array();
 
+    private static $groupExtension = null;
+
     /** tries to get the nth-child. n starts at 0. */
     public function get($n)
     {
@@ -140,10 +142,9 @@ class Group implements \Countable
         return $this->children;
     }
 
-
-    public function count()
+    public function count($rec = true)
     {
-        if ($this->isLeaf()) {
+        if ($this->isLeaf() || $rec == false) {
 
             return count($this->children);
         }
@@ -152,6 +153,7 @@ class Group implements \Countable
         foreach ($this->children as &$group) {
             $total += $group->count();
         }
+        
 
         return $total;
     }
@@ -177,7 +179,7 @@ class Group implements \Countable
     /**
      * Gets the leaf of a group.
      * A leaf node contains the sorted data.
-     * @return ShowtimesGroup
+     * @return Group
      */
     public function getLeaf()
     {
@@ -215,8 +217,19 @@ class Group implements \Countable
         self::$fns = $fns;
     }
 
+    public function registerExtension($extension)
+    {
+        self::$groupExtension = $extension;
+    }
+
     public function __call($name, $args)
     {
+        if (self::$groupExtension && method_exists(self::$groupExtension, $name)) {
+            $argument = count($args) == 1 ? $args[0] : false;
+            $value =  self::$groupExtension->{$name}($this, $argument);
+            return $value;
+        }
+
         if (isset(self::$fns[$name]))
         {
             return call_user_func_array(self::$fns[$name], array_merge(array($this->getNode(), $args)));
@@ -225,13 +238,12 @@ class Group implements \Countable
         if ($this->isLeaf()) {
             if (method_exists($this->getNode(), $name)) {
                 return call_user_func_array(array($this->getNode(), $name), $args);
-            }  elseif ($this->children) {
+            } elseif ($this->children && is_object($this->children[0])) {
                 // call it on the first child.
                 return call_user_func_array(array($this->children[0], $name), $args);
             }
         }
         $leaf = $this->getLeaf();
-
         return call_user_func_array(array($leaf, $name), $args);
     }
 
@@ -239,12 +251,12 @@ class Group implements \Countable
     {
         $string = 'Group ' . $this->caption;
         if ($this->children) {
-            $string .= '[';
+            $string .= '{';
             foreach ($this->children as $child) {
                 $string .= $this->toString($child);
             }
 
-            $string .= ']';
+            $string .= '}';
         }
 
         return $string;
@@ -252,23 +264,24 @@ class Group implements \Countable
 
     /**
      * Returns the value of this field.
-     * @param $field
+     * @param  scalar $field optional If  field is false, the current array object or plain value is given back. If a field is set, the current field from the object is returned.
+     * @param  Group $node optional  the node on which the field should be retrieved from. If none is given, the first node from the group is taken.
      */
-    public function getValue($field)
+    public function getValue($field = false, $node = null)
     {
-        return $this->getField($this->getNode(), $field);
+        $node = $node !== null ? $node : $this->getNode();
+        return $this->getField($node, $field);
     }
-
 
     public function toString($child)
     {
-        $string = "";
+        $string = " ";
         if ($child instanceof Group) {
 
-            $string .= $child->__toString();
-            return $string . $this->toString($child->getChildren(true));
+            return $child->__toString();
         } else {
-            return $this->asString($child);
+            // stringify objects, arrays and scalar as best as possible:
+            return $string . $this->asString($child);
         }
     }
 
@@ -288,13 +301,13 @@ class Group implements \Countable
     protected function retrieveNodes()
     {
         $data = array();
-        $children = $this->getChildren(true);
+        $children = $this->getChildren();
         foreach ($children as $showOrGroup) {
             if (is_scalar($showOrGroup)) {
                 $data[] = $showOrGroup;
             } elseif (is_object($showOrGroup) && get_class($showOrGroup) === 'Group') {
                 $merge = $showOrGroup->retrieveNodes();
-                $data = array_merge($data, $merge); // merge nodes
+                $data = array_merge($data, $merge);
             } else {
                 $data[] = $showOrGroup;
             }
@@ -309,12 +322,11 @@ class Group implements \Countable
      * @param $keys
      * @return string
      */
-    protected function createOrderKey($show, $keys)
+    protected function createOrderKey($group, $keys)
     {
         $key = '';
         foreach ($keys as $orderBy) {
-            $method =$this->getField($orderBy);
-            $key .= $this->toString($show->$method()) . '-';
+            $key .= $this->getField($this->getNode(), $orderBy);
         }
 
         return $key;
@@ -322,19 +334,16 @@ class Group implements \Countable
 
     protected function asString($var)
     {
-        if (!$var) {
-
-            return '';
-        } elseif (is_scalar($var)) {
-            return $var;
+        if (is_scalar($var)) {
+            return 's:' . $var;
 
         } elseif (is_object($var)) {
             if (method_exists($var, 'getName')) {
 
-                return $var->getName();
+                return 'n:' . $var->getName();
             } elseif (method_exists($var, 'getId')) {
 
-                return $var->getId() . ',';
+                return 'id:' . $var->getId() . ',';
             } elseif (get_class($var) === 'Date' || get_class($var) === 'DateTime') {
 
                 return $var->format('Y-m-d H:i:s');
@@ -342,30 +351,42 @@ class Group implements \Countable
                 throw new GroupingException("Could not resolve var: " . get_class($var));
             }
         } elseif (is_array($var)) {
-            // stop recursive displaying array values, use * instead..
-            return '[' . str_repeat('*,', count($var)) . ']';
+
+           $r = 'arr: ';
+            foreach ($var as $v) {
+               $r = $r . ' ' . $v;
+           }
+           return '[' .  $r . ']';
         }
 
-        throw new GroupingException("Could not convert to string value: " . gettype($var) . is_object($var) ? get_class($var) : '');
+    throw new GroupingException("Could not convert to string value: " . gettype($var) . is_object($var) ? get_class($var) : '');
     }
 
     /**
      * Tries to get the 'field' from a group or a raw element.
      * If a group has registered functions on it, it accesses them as well.
-     * @param $ojbOrArr
+     * @param $mixed
      * @param $field
      * @return mixed
      */
-    private function getField($ojbOrArr, $field)
+    private function getField($mixed, $field)
     {
-        if (is_object($ojbOrArr)) {
-            $getter = 'get' . ucfirst($field);
-            return $ojbOrArr->{$getter}();
-        } elseif (is_array($ojbOrArr) && isset($ojbOrArr[$field])) {
-            return $ojbOrArr[$field];
+        if (! is_scalar($field)) {
+            throw new \Exception("Field is not scalar: " . gettype($field));
+        }
+
+        if ($field === false) {
+            return $mixed;
+        } elseif (is_array($mixed) && isset($mixed[$field])) {
+            return $mixed[$field];
         } elseif(isset(self::$fns[$field])) {
             $call = self::$fns[$field];
-            return $call($ojbOrArr);
+            return $call($mixed);
+        } elseif (is_object($mixed)) {
+            $getter = 'get' . ucfirst($field);
+            return $mixed->{$getter}();
+        } else {
+            throw new \Exception(sprintf('Object must be array or object but was %s, or field must exists as extension function %s ', array(gettype($mixed, $field))));
         }
     }
 }

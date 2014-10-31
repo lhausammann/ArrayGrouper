@@ -19,10 +19,14 @@ $array = array(
     array('title' => 'A life aquatic',               'director' => 'Wes Anderson',      'year' => '2014', 'rating'  => 4.1),
     array('title' => 'The royal tennenbaums',    'director' => 'Wes Anderson',          'year' => '2001', 'rating' => 3.7),
     array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson', 'year' => '2014', 'rating' => 4.1),
+    array('title' => 'A really bad movie',    'director' => 'Max Maxxen', 'year' => '2014', 'rating' => 0),
+
 );
 
+shuffle($array);
+
 $coll = new Collection($array);
-$coll->groupBy('uselessString', array('year', 'title'));
+$coll->groupBy('key', array('year', 'title'));
 $groups = $coll->apply();
 
 /** @var $child \ArrayGrouper\Grouper\Group */
@@ -31,8 +35,8 @@ foreach($groups->getChildren() as $child) {
 }
 
 $coll = new Collection($array);
-$coll->groupBy('uselessString2', array('year'))
-     ->groupBy('anotherUselessy', array('title'));
+$coll->groupBy('aKey', array('year'))
+     ->groupBy('anotherKey', array('title'));
 $groups = $coll->apply();
 
 /** @var $child \ArrayGrouper\Grouper\Group */
@@ -45,8 +49,8 @@ foreach($groups->getChildren() as $child) {
 }
 
 $coll = new Collection($array);
-$coll->groupBy('uselessString2', array('director'))
-    ->groupBy('anotherUselessy', array('year', 'title'))
+$coll->groupBy('aKey', array('director'))
+    ->groupBy('anotherkey', array('year', 'title'))
     ->sortBy('rating');
 $groups = $coll->apply();
 
@@ -61,24 +65,23 @@ foreach($groups->getChildren() as $child) {
 
 /** custom grouping */
 $coll = new Collection($array);
-$coll->registerGroupingFunction('firstLetter', function($arr) {
+$coll->registerGroupingFunction('century', function($arr) {
 
-    return ucfirst($arr['title']{0});
+    return (int) ucfirst($arr['year'] / 100 ) + 1 . ' Jh.';
 
 });
-/*
-    ->groupBy('firstLetter')
-    ->groupBy('anotherUselessy', array('year', 'title'))*/
-$coll->groupByDescending('aKey', array('firstLetter'))
-     ->groupBy('anOtherKey', array('year','title'));
+
+$coll->groupByDescending('aKey', array('century'))
+     ->groupBy('anotherKey', array('year','title'));
 $groups = $coll->apply();
 
 foreach($groups->getChildren() as $child) {
-    echo $child->formatCaption('<h1>%firstLetter%</h1>'); // use it in caption
+    echo $child->formatCaption('<h1>%century%</h1>'); // use it in caption
+    var_dump($child->min('rating'));
 
     foreach ($child->getChildren() as $node) {
-        echo $node->formatCaption('%title%');
-        echo $node->firstLetter(); // and use it as object property
+        echo $node->formatCaption('%year% - %title%');
+        echo $node->century(); // and use it as object property
         $node->getNodes();
     }
 }
