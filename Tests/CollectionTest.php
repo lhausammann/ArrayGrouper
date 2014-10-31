@@ -34,7 +34,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 
     public function testGroupFnsRandomly()
     {
-        for ($i = 0; $i < 10; $i++) { // 100 test runs
+        for ($i = 0; $i < 50; $i++) { // 100 test runs
             $array = array();
             for ($j = 0; $j < 100; $j++) {
                $array[$j] = mt_rand(-1,200);
