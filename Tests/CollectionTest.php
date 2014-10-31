@@ -36,7 +36,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 
     public function testGroupFnsRandomly()
     {
-        for ($i = 0; $i < 100; $i++) { // 100 test runs
+        for ($i = 0; $i < 10; $i++) { // 100 test runs
             $array = array();
             for ($j = 0; $j < 100; $j++) {
                $array[$j] = mt_rand(-1,200);
@@ -51,9 +51,9 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
             $collection->groupBy('testGroup', array('evenUneven'));
             $collection->groupByDescending('key', array('byRandom'));
             $groupings = $collection->apply();
-            //$this->assertEquals($count, $groupings->count());
-            //$this->assertEquals($min, $groupings->min(), 'values on round  ' . $i . ': ' . $groupings);
-            //$this->assertEquals($max, $groupings->max());
+            $this->assertEquals($count, $groupings->count());
+            $this->assertEquals($min, $groupings->min(), 'values on round  ' . $i . ': ' . $groupings);
+            $this->assertEquals($max, $groupings->max());
             // $this->assertEquals(17, $groupings->max(), 'sequence was: ' . implode(', ', $array));
             // $this->assertEquals( $sum, $groupings->sum());
         }
