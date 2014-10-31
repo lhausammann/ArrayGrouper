@@ -9,8 +9,6 @@
 namespace ArrayGrouper\Tests;
 use ArrayGrouper\Grouper\Collection;
 
-require_once(__DIR__ . '/../vendor/autoload.php');
-
 class CollectionTest extends \PHPUnit_Framework_TestCase {
 
     public function testOneLevelGrouping()
