@@ -43,6 +43,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
             $sum = array_sum($array);
             $min = min($array);
             $max = max($array);
+            $avg = $sum / $count;
             $collection = new Collection($array);
             $collection->registerGroupingFunction('evenUneven', function($element) {return $element % 2; });
             $collection->registerGroupingFunction('byRandom', function($element) { return rand(7,9); });
@@ -52,8 +53,9 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
             $this->assertEquals($count, $groupings->count());
             $this->assertEquals($min, $groupings->min(), 'values on round  ' . $i . ': ' . $groupings);
             $this->assertEquals($max, $groupings->max());
-            // $this->assertEquals(17, $groupings->max(), 'sequence was: ' . implode(', ', $array));
-            // $this->assertEquals( $sum, $groupings->sum());
+
+            $this->assertEquals($sum, $groupings->sum(), 'sequence was: ' . implode(', ', $array));
+            $this->assertEquals($avg, $groupings->avg());
         }
     }
 }

@@ -241,10 +241,14 @@ class Group implements \Countable
             } elseif ($this->children && is_object($this->children[0])) {
                 // call it on the first child.
                 return call_user_func_array(array($this->children[0], $name), $args);
+            } else {
+
+                return;
             }
         }
         $leaf = $this->getLeaf();
-        return call_user_func_array(array($leaf, $name), $args);
+        //return call_user_func_array(array($leaf->children[0], $name), $args);
+        return $leaf->$name($args); // recurse
     }
 
     public function __toString()
@@ -292,6 +296,24 @@ class Group implements \Countable
     {
         // start it.
         return $this->retrieveNodes();
+    }
+
+    public function getLeafNodes(Group $group = null, $data = array())
+
+    {
+        if (! $group) {
+            $group = $this;
+        }
+
+        if ($group->isLeaf()) {
+            $data[] = $group;
+        } else {
+            foreach ($group->getChildren() as $child) {
+                $data = $this->getLeafNodes($child, $data);
+            }
+        }
+
+        return $data;
     }
 
     /**

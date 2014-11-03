@@ -10,11 +10,6 @@ namespace ArrayGrouper\Grouper;
 
 
 class GroupExtensions {
-    // TODO: This must be implemented recursively for nested groups.
-    public function avg(Group $group)
-    {
-        throw new \Exception("Not implemented yet.");
-    }
 
     public function min($group, $field)
     {
@@ -26,8 +21,23 @@ class GroupExtensions {
         return $this->groupFn($group, $field, 'max');
     }
 
-    public function sum($group, $field) {
-        return $this->groupFn($group, $field, 'sum');
+    public function sum(Group $group, $field) {
+        $sum = 0;
+        $leafs = $group->getLeafNodes();
+        foreach($leafs as $i =>  $leaf) {
+            foreach($leaf->getChildren() as $child) {
+                $sum += $leaf->getValue($field, $child);
+            }
+        }
+
+        return $sum;
+    }
+
+    public function avg(Group $group, $field)
+    {
+
+        return $group->sum($group, $field) / $group->count($group, $field);
+
     }
 
     protected function minEvaluation($a, $b) {
@@ -44,11 +54,6 @@ class GroupExtensions {
         return $a > $b ? $a : $b;
     }
 
-    protected function sumEvaluation($a, $b)
-    {
-        throw new \Exception("Not implemented");
-    }
-
     protected function groupFn(Group $group, $field, $evaluation)
     {
         $call = $evaluation . 'Evaluation';
@@ -57,12 +62,12 @@ class GroupExtensions {
         $isLeaf = $group->isLeaf();
         foreach($children as $child) {
             if ($isLeaf === false) {
-               $current =  $this->$call($current, $this->groupFn($child, $field, $evaluation));
+               $current =  $this->$call($current, $this->groupFn($child, $field, $evaluation), $group);
             } else {
                 $nodes = $group->getNodes();
                 foreach ($nodes as $node) {
                     $value = $group->getValue($field, $node);
-                    $current =  $this->$call($current, $value, $evaluation);
+                    $current =  $this->$call($current, $value, $group);
                 }
             }
         }
