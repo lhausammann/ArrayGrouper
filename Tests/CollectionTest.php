@@ -34,29 +34,27 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 
     public function testGroupFnsRandomly()
     {
-        for ($i = 0; $i < 50; $i++) { // 100 test runs
-            $array = array();
-            for ($j = 0; $j < 100; $j++) {
-               $array[$j] = mt_rand(-1,200);
-            }
-            $count = count($array);
-            $sum = array_sum($array);
-            $min = min($array);
-            $max = max($array);
-            $avg = $sum / $count;
-            $collection = new Collection($array);
-            $collection->registerGroupingFunction('evenUneven', function($element) {return $element % 2; });
-            $collection->registerGroupingFunction('byRandom', function($element) { return rand(7,9); });
-            $collection->groupBy('testGroup', array('evenUneven'));
-            $collection->groupByDescending('key', array('byRandom'));
-            $groupings = $collection->apply();
-            $this->assertEquals($count, $groupings->count());
-            $this->assertEquals($min, $groupings->min(), 'values on round  ' . $i . ': ' . $groupings);
-            $this->assertEquals($max, $groupings->max());
-
-            $this->assertEquals($sum, $groupings->sum(), 'sequence was: ' . implode(', ', $array));
-            $this->assertEquals($avg, $groupings->avg());
+        $array = array();
+        for ($j = 0; $j < 1000; $j++) {
+           $array[$j] = mt_rand(-100, 200);
         }
+        $count = count($array);
+        $sum = array_sum($array);
+        $min = min($array);
+        $max = max($array);
+        $avg = $sum / $count;
+
+        $collection = new Collection($array);
+        $collection->registerGroupingFunction('evenUneven', function($element) {return $element % 2; });
+        $collection->registerGroupingFunction('byRandom', function($element) { return rand(7,9); });
+        $collection->groupBy('testGroup', array('evenUneven'));
+        $collection->groupByDescending('key', array('byRandom'));
+        $groupings = $collection->apply();
+        $this->assertEquals($count, $groupings->count());
+        $this->assertEquals($min, $groupings->min(), 'values on round  '  . ': ' . $groupings);
+        $this->assertEquals($max, $groupings->max());
+        $this->assertEquals($sum, $groupings->sum(), 'sequence was: ' . implode(', ', $array));
+        $this->assertEquals($avg, $groupings->avg());
     }
 }
  

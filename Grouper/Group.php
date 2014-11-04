@@ -330,7 +330,7 @@ class Group implements \Countable
             } elseif (is_object($showOrGroup) && get_class($showOrGroup) === 'Group') {
                 $merge = $showOrGroup->retrieveNodes();
                 $data = array_merge($data, $merge);
-            } else {
+            } else { // array or object
                 $data[] = $showOrGroup;
             }
         }
