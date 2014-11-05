@@ -70,23 +70,6 @@ class Group implements \Countable
         return $this->type == self::LEAF;
     }
 
-    public function orderBy()
-    {
-        if ($this->sorted) {
-            return;
-        }
-
-        $this->sorted = true;
-        $sort = array();
-        foreach ($this->children as $child) {
-            $key = $this->createOrderKey($child, $this->orderBys);
-            $sort[$key] = $child;
-        }
-
-        uksort($sort, 'strnatcmp');
-        $this->children = array_values($sort);
-    }
-
     public function setParent($parent)
     {
         $this->parent = $parent;
@@ -101,12 +84,16 @@ class Group implements \Countable
     {
 
         $this->children = $children;
+        //$this->key = $key;
     }
 
-    public function addChild($child)
+    public function addChild($child, $key = '')
     {
-        $child->parent = $this;
+        //$child->parent = $this;
         $this->children[] = $child;
+        $child->key = $key;
+        return $child;
+
     }
 
     public function setKey($key)
@@ -133,27 +120,21 @@ class Group implements \Countable
      */
     public function getChildren($internal = false)
     {
-        if (!$this->orderBys) {
-        } else {
-            $this->orderBy($this->orderBys, null);
-            $this->orderBys = null;
-        }
 
         return $this->children;
     }
 
     public function count($rec = true)
     {
-        if ($this->isLeaf() || $rec == false) {
+        if ($this->type === self::LEAF || $rec == false) {
 
             return count($this->children);
         }
 
         $total = 0;
-        foreach ($this->children as &$group) {
+        foreach ($this->children as $group) {
             $total += $group->count();
         }
-        
 
         return $total;
     }
@@ -165,11 +146,10 @@ class Group implements \Countable
      */
     public function getNode()
     {
-        if ($this->isLeaf() && ($this->children)) {
+        if ($this->type === self::LEAF && $this->children) {
 
             return $this->children[0];
-        } else if (($this->children)) {
-
+        } elseif ($this->children) {
             return $this->children[0]->getNode();
         }
 
@@ -183,11 +163,10 @@ class Group implements \Countable
      */
     public function getLeaf()
     {
-        if ($this->isLeaf()) {
+        if ($this->type === self::LEAF) {
             return $this;
         } else if ($this->children){
-            $leaf = $this->children[0]->getLeaf();
-            return $leaf;
+            return $this->children[0]->getLeaf();
         }
     }
 
@@ -225,17 +204,12 @@ class Group implements \Countable
     public function __call($name, $args)
     {
         if (self::$groupExtension && method_exists(self::$groupExtension, $name)) {
-            $argument = count($args) == 1 ? $args[0] : false;
-            $value =  self::$groupExtension->{$name}($this, $argument);
-            return $value;
-        }
-
-        if (isset(self::$fns[$name]))
+            $argument = count($args) === 1 ? $args[0] : false;
+            return  self::$groupExtension->{$name}($this, $argument);
+        } elseif (isset(self::$fns[$name]))
         {
             return call_user_func_array(self::$fns[$name], array_merge(array($this->getNode(), $args)));
-        }
-
-        if ($this->isLeaf()) {
+        } elseif ($this->type === self::LEAF) {
             if (method_exists($this->getNode(), $name)) {
                 return call_user_func_array(array($this->getNode(), $name), $args);
             } elseif ($this->children && is_object($this->children[0])) {
@@ -246,6 +220,7 @@ class Group implements \Countable
                 return;
             }
         }
+
         $leaf = $this->getLeaf();
         //return call_user_func_array(array($leaf->children[0], $name), $args);
         return $leaf->$name($args); // recurse
@@ -298,17 +273,16 @@ class Group implements \Countable
         return $this->retrieveNodes();
     }
 
-    public function getLeafNodes(Group $group = null, $data = array())
-
+    public function getLeafNodes(Group &$group = null, &$data = array())
     {
         if (! $group) {
             $group = $this;
         }
 
-        if ($group->isLeaf()) {
+        if ($group->type === self::LEAF) {
             $data[] = $group;
         } else {
-            foreach ($group->getChildren() as $child) {
+            foreach ($group->children as &$child) {
                 $data = $this->getLeafNodes($child, $data);
             }
         }
@@ -323,8 +297,8 @@ class Group implements \Countable
     protected function retrieveNodes()
     {
         $data = array();
-        $children = $this->getChildren();
-        foreach ($children as $showOrGroup) {
+        $children = $this->children;
+        foreach ($children as &$showOrGroup) {
             if (is_scalar($showOrGroup)) {
                 $data[] = $showOrGroup;
             } elseif (is_object($showOrGroup) && get_class($showOrGroup) === 'Group') {

@@ -16,8 +16,8 @@ use ArrayGrouper\Grouper\Group;
 
 class Collection
 {
-    const GROUP_ASCENDING = 'asc';
-    const GROUP_DESCENDING = 'desc';
+    const GROUP_ASCENDING = 1;
+    const GROUP_DESCENDING = 2;
 
     protected $result = null;
     protected $applied = false;
@@ -71,15 +71,18 @@ class Collection
      * @desc groups and orders all items.
      * @return array
      */
-    public function apply()
+    public function apply($data = array())
     {
-        if (! $this->data) {
-
-            throw new \Exception('data must be set to group accordingly.');
+        if ($this->applied && ! $data) {
+            return $this->result; // do not apply more than once
         }
 
-        if ($this->applied) {
-            return $this->result; // do not apply more than once
+        if ($data) {
+            $this->applied = false;
+            $this->date = $data;
+        } elseif (! $this->data) {
+
+            throw new \Exception('data must be set to group accordingly.');
         }
 
         $this->applied = true;
@@ -109,19 +112,20 @@ class Collection
      * @param $keys
      * @return string
      */
-    protected function createOrderKey($data, $keys)
+    protected function createOrderKey(&$data, &$keys)
     {
         $key = '';
         foreach ($keys as $orderBy) {
-
             if (isset($this->fns[$orderBy] )) {
-                // do we have a custom registered grouping fn?
                 $key .= '-' . $this->fns[$orderBy]($data);
+                continue;
             } elseif (is_array($data)) {
                 $key .= '-' . $data[$orderBy] ?: '0';
+                continue;
             } elseif (is_object($data)) {
                 $method = 'get' . ucfirst($orderBy);
-                $key .= $this->toString($data->$method()) . '-';
+                $key .= '-' . $this->toString($data->$method());
+                continue;
             }
         }
 
@@ -167,49 +171,57 @@ class Collection
         // current grouping fields
         $caption = key($groupArray);
         $groupValues = array_shift($groupArray);
+        // list($caption, $groupValues) = each($groupArray);
+
         $group = new Group($caption, $groupValues, Group::GROUP);
         $groupings = array();
         // group the flat structure
-        foreach ($structure as $data) {
-            $key = strtolower($this->createOrderKey($data, $groupValues)); // remove strtolower if you need to distinguish between upper/lowercase
+
+
+        $c = count($structure);
+        $i = -1;
+        while (++$i < $c) {
+            $key = ($this->createOrderKey($structure[$i], $groupValues));
             if (isset($groupings[$key])) {
-                $groupings[$key][] = $data;
+                $groupings[$key][] = $structure[$i];
             } else {
-                $groupings[$key] = array($data);
+                $groupings[$key] = array($structure[$i]);
             }
         }
 
+
         // sort structure by generated key using group order
-        $order = $this->groupOrderBys[$caption];
-        if ($order == 'asc') {
+
+
+        if ($this->groupOrderBys[$caption] === 1) {
             uksort($groupings, 'strnatcmp');
-        } else if ($order == 'desc') {
+        } elseif ($this->groupOrderBys[$caption] === 2) {
             uksort($groupings, function($a, $b) {return -strnatcmp($a, $b);});
         } else {
-            throw new GroupingException("Expected desc or asc [defautl] for grouping, but given was: " . $order);
+            throw new GroupingException("Expected desc or asc [defautl] for grouping.");
         }
 
         // group entries recursively if we have grouping criteria left
-        if (count($groupArray)) {
-            foreach ($groupings as $key => $values) {
-                $group->addChild($c = $this->groupIt($values, $groupArray));
-                $c->setKey($key);
-            }
-        } else {
+        // foreach ($groupings as $key => $values) {
+
+        if ($groupArray) goto loop; else goto leaf;
+
+        loop:
+            $g = each($groupings);
+            if ($g === false)
+                goto endloop;
+            $group->addChild($this->groupIt($g[1], $groupArray), $g[0]);
+        goto loop;
 
 
-            // No group criteria left, create leave node.
-            foreach ($groupings as $key => $g) {
-                $child = new Group(implode('-',$groupValues), $groupValues, Group::LEAF);
-                $child->replaceChildren(array_values($g));
-                $child->setKey($key);
-                $child->setOrderBys($this->orderBys);
-                $child->setParent($group);
-                $group->addChild($child);
-            }
+        leaf:
+        while ($g = each($groupings)) {
+            $child = new Group(implode('-',$groupValues), $groupValues, Group::LEAF);
+            $child->replaceChildren($g[1]);
+            $group->addChild($child);
         }
 
-        return $group;
+        endloop: return $group;
     }
 }
 
