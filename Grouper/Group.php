@@ -19,10 +19,8 @@ class Group implements \Countable
 
     private $type;
     private $children = array();
-    private $sorted = false;
     private $caption = '';
     private $key;
-    private $parent;
     private static $fns = array();
 
     private static $groupExtension = null;
@@ -48,10 +46,12 @@ class Group implements \Countable
      * @param $caption
      * @param $fields
      * @param $what self::ROOT | self::GROUP | self::LEAF
+     * @param $data to set data direclty on this node. only on leafs.
      */
-    public function __construct($caption, $fields, $type = self::GROUP)
+    public function __construct($caption, $type = self::GROUP, array $data = null)
     {
         $this->caption = $caption;
+        $this->children = $data;
         $this->type = $type;
     }
 
@@ -70,11 +70,6 @@ class Group implements \Countable
         return $this->type == self::LEAF;
     }
 
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-    }
-
     public function getCaption()
     {
         return $this->caption;
@@ -82,18 +77,17 @@ class Group implements \Countable
 
     public function replaceChildren(array $children)
     {
-
+        $this->type = self::LEAF;
         $this->children = $children;
-        //$this->key = $key;
     }
 
     public function addChild($child, $key = '')
     {
         //$child->parent = $this;
+
         $this->children[] = $child;
         $child->key = $key;
         return $child;
-
     }
 
     public function setKey($key)
@@ -118,7 +112,7 @@ class Group implements \Countable
      *
      * @return array|EntityContainer
      */
-    public function getChildren($internal = false)
+    public function getChildren()
     {
 
         return $this->children;
@@ -175,15 +169,15 @@ class Group implements \Countable
      * E.g '%title% in %city%' will replace that string by e.g. 'Gone Girl in Zürich' if we grouped by title and cities,
      * @param $stringWithPlaceholders
      */
-    public function formatCaption($stringWithPlaceholders)
+    public function formatCaption($stringWithPlaceholders, $node = null)
     {
+        $node = $node ?: $this->getNode();
         $replacements = $stringWithPlaceholders;
         $pattern = '/%([a-z]++)%/i';
         $hasFn = count(self::$fns);
         $matches = array();
         preg_match_all($pattern, $stringWithPlaceholders, $matches);
         foreach ($matches[0] as $i => $field) {
-            $node = $this->getNode();
             $value = $this->getField($node, $matches[1][$i]);
             $replacements = str_replace($field, $value, $replacements);
         }
@@ -265,12 +259,13 @@ class Group implements \Countable
     }
 
     /**
-     * Get shows returns all data ordered by the the group order.
+     * Get node returns all data ordered by the the group order.
      */
-    public function getNodes()
+    public function getElements()
     {
         // start it.
-        return $this->retrieveNodes();
+        static $a = array();
+        return $this->type === self::LEAF ? $this->children : $this->retrieveElements($a);
     }
 
     public function getLeafNodes(Group &$group = null, &$data = array())
@@ -294,38 +289,19 @@ class Group implements \Countable
      * Returns all nodes as a flat array, order by group order.
      * @return array
      */
-    protected function retrieveNodes()
+    protected function retrieveElements(&$data)
     {
         $data = array();
         $children = $this->children;
-        foreach ($children as &$showOrGroup) {
-            if (is_scalar($showOrGroup)) {
-                $data[] = $showOrGroup;
-            } elseif (is_object($showOrGroup) && get_class($showOrGroup) === 'Group') {
-                $merge = $showOrGroup->retrieveNodes();
-                $data = array_merge($data, $merge);
-            } else { // array or object
+        foreach ($children as $showOrGroup) {
+            if (is_object($showOrGroup) && get_class($showOrGroup) === 'Group') {
+                $data = $showOrGroup->retrieveElements($data);
+            } else { // array or object or scalar
                 $data[] = $showOrGroup;
             }
         }
 
         return $data;
-    }
-
-    /**
-     * Creates a key which is used for ordering and grouping all results.
-     * @param $show
-     * @param $keys
-     * @return string
-     */
-    protected function createOrderKey($group, $keys)
-    {
-        $key = '';
-        foreach ($keys as $orderBy) {
-            $key .= $this->getField($this->getNode(), $orderBy);
-        }
-
-        return $key;
     }
 
     protected function asString($var)
@@ -367,10 +343,6 @@ class Group implements \Countable
      */
     private function getField($mixed, $field)
     {
-        if (! is_scalar($field)) {
-            throw new \Exception("Field is not scalar: " . gettype($field));
-        }
-
         if ($field === false) {
             return $mixed;
         } elseif (is_array($mixed) && isset($mixed[$field])) {
@@ -382,7 +354,7 @@ class Group implements \Countable
             $getter = 'get' . ucfirst($field);
             return $mixed->{$getter}();
         } else {
-            throw new \Exception(sprintf('Object must be array or object but was %s, or field must exists as extension function %s ', array(gettype($mixed, $field))));
+            throw new \Exception(sprintf('Object must be array or obbject but was %s, or field must exists as extension function %s ', array(gettype($mixed, $field))));
         }
     }
 }

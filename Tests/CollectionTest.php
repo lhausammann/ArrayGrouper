@@ -21,7 +21,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
         $groupings = $collection->apply();
         $z = 0;
         foreach ($groupings->getChildren() as $i => $group) {
-            $elements = $group->getNodes();
+            $elements = $group->getElements();
             foreach ($elements as $element) {
                 $z++;
                 $this->assertTrue($element % 2 == $i, $element . ' modulo ' . $i);
@@ -46,7 +46,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 
         $collection = new Collection($array);
         $collection->registerGroupingFunction('evenUneven', function($element) {return $element % 2; });
-        $collection->registerGroupingFunction('byRandom', function($element) { return rand(7,9); });
+        $collection->registerGroupingFunction('byRandom', function($element) { return rand(0,20); });
         $collection->groupBy('testGroup', array('evenUneven'));
         $collection->groupByDescending('key', array('byRandom'));
         $groupings = $collection->apply();

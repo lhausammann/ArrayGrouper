@@ -13,13 +13,13 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 
 $array = array(
-    array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014',  'rating' => 4.1),
+    array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014',  'rating' => 4.0),
     array('title' => 'Easy Rider',                  'director' => 'Dennis Hopper',      'year' => '1969',  'rating' => 4.2),
     array('title' => 'Coffee & Cigarettes',         'director' => 'Jim Jarmush',        'year' => '2004', 'rating'  => 3.7),
-    array('title' => 'A life aquatic',               'director' => 'Wes Anderson',      'year' => '2014', 'rating'  => 4.1),
-    array('title' => 'The royal tennenbaums',    'director' => 'Wes Anderson',          'year' => '2001', 'rating' => 3.7),
-    array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson', 'year' => '2014', 'rating' => 4.1),
-    array('title' => 'A really bad movie',    'director' => 'Max Maxxen', 'year' => '2014', 'rating' => 0),
+    array('title' => 'A life aquatic',              'director' => 'Wes Anderson',       'year' => '2014', 'rating'  => 4.1),
+    array('title' => 'The royal tennenbaums',       'director' => 'Wes Anderson',       'year' => '2001', 'rating'  => 3.7),
+    array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014', 'rating'  => 4.1),
+    array('title' => 'A really bad movie',          'director' => 'Max Maxxen',         'year' => '2014', 'rating'  => 0.1),
 
 );
 
@@ -43,15 +43,15 @@ $groups = $coll->apply();
 foreach($groups->getChildren() as $child) {
     echo $child->formatCaption('<h1>%year%</h1>');
     foreach ($child->getChildren() as $node) {
-        echo $node->getValue('title') . $node->count() . '<br />';
+        echo $node->getValue('title') . $node->getValue('rating') . '---' .$node->count() . '<br />';
     }
     echo $child->formatCaption('Im Jahr %year% entstand %title% <br />');
 }
 
 $coll = new Collection($array);
 $coll->groupBy('aKey', array('director'))
-    ->groupBy('anotherkey', array('year', 'title'))
-    ->sortBy('rating');
+    ->groupBy('anotherkey', array('year', 'title'));
+
 $groups = $coll->apply();
 
 /** @var $child \ArrayGrouper\Grouper\Group */
@@ -77,14 +77,26 @@ $groups = $coll->apply();
 
 foreach($groups->getChildren() as $child) {
     echo $child->formatCaption('<h1>%century%</h1>'); // use it in caption
-    var_dump($child->min('rating'));
 
     foreach ($child->getChildren() as $node) {
         echo $node->formatCaption('%year% - %title%');
         echo $node->century(); // and use it as object property
-        $node->getNodes();
     }
 }
+
+$coll = new Collection($array);
+$coll->groupByDescending('aKey', array('year'))
+    ->orderByDescending('sortKey', array('rating'));
+$groups = $coll->apply();
+
+foreach($groups->getChildren() as $child) {
+    echo $child->formatCaption('<h1>%year%</h1>'); // use it in caption
+
+    foreach ($child->getChildren() as $arr) {
+        echo $child->formatCaption('<h3>%rating%: %title%</h3>', $arr); // format the raw data
+    }
+}
+
 
 
 

@@ -64,7 +64,7 @@ class GroupExtensions {
             if ($isLeaf === false) {
                $current =  $this->$call($current, $this->groupFn($child, $field, $evaluation), $group);
             } else {
-                $nodes = $group->getNodes();
+                $nodes = $group->getElements();
                 foreach ($nodes as $node) {
                     $value = $group->getValue($field, $node);
                     $current =  $this->$call($current, $value, $group);

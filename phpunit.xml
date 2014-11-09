@@ -14,4 +14,17 @@
 
         </testsuite>
     </testsuites>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="false">
+            <directory>.</directory>
+            <exclude>
+                <directory>./Tests</directory>
+                <directory>./Resources</directory>
+                <directory>./vendor</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+
 </phpunit>

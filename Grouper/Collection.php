@@ -1,10 +1,10 @@
 <?php
 /**
-* Utility class to sort a Collection for a listing.
-* $coll = new Collection($showtimes);
-* $coll->orderBy('title', projection);
-*
-*/
+ * Utility class to sort a Collection for a listing.
+ * $coll = new Collection($showtimes);
+ * $coll->orderBy('title', projection);
+ *
+ */
 
 namespace ArrayGrouper\Grouper;
 use ArrayGrouper\Exception\GroupingException;
@@ -21,27 +21,18 @@ class Collection
 
     protected $result = null;
     protected $applied = false;
-    protected $orderBys = array(); // children order
 
-    private $groupOrderBys = array(); // group order
+    private $orderBys = array(); //sort fields not used for grouping
+    private $groupOrderBys = array(); // group order (asc, desc), also containig orderBys order.
+
+    private $groupings = array(); // group fields
     private $fns = array(); // callback grouping functions
-    private $data = array();
+    private $data = array(); // the data to group
 
     public function __construct($data = array())
     {
 
         $this->data = $data;
-    }
-
-    public function sortBy($orderBys)
-    {
-        if (is_array($orderBys)) {
-            $this->orderBys = array_merge($this->orderBys, $orderBys);
-        } else {
-            $this->orderBys[] = $orderBys;
-        }
-
-        return $this;
     }
 
     /**
@@ -50,13 +41,7 @@ class Collection
      */
     public function groupBy($caption, array $fields, $orderBy = self::GROUP_ASCENDING)
     {
-        $groupings = array();
-
-        foreach ($fields as $field) {
-
-            $groupings[] = $field;
-        }
-        $this->groupings[$caption] = $groupings;
+        $this->groupings[$caption] = $fields;
         $this->groupOrderBys[$caption] = $orderBy;
 
         return $this;
@@ -67,11 +52,25 @@ class Collection
         return $this->groupBy($caption, $fields, self::GROUP_DESCENDING);
     }
 
+
+    public function orderBy($caption, array $fields, $orderBy = self::GROUP_ASCENDING)
+    {
+        $this->orderBys[$caption] = $fields;
+        $this->groupOrderBys[$caption] = $orderBy;
+
+        return $this;
+    }
+
+    public function orderByDescending($caption, array $fields)
+    {
+        return $this->orderBy($caption, $fields, self::GROUP_DESCENDING);
+    }
+
     /**
      * @desc groups and orders all items.
      * @return array
      */
-    public function apply($data = array())
+    public function apply($data = array(), $isOrdered = false)
     {
         if ($this->applied && ! $data) {
             return $this->result; // do not apply more than once
@@ -79,13 +78,19 @@ class Collection
 
         if ($data) {
             $this->applied = false;
-            $this->date = $data;
+            $this->data = $data;
         } elseif (! $this->data) {
 
             throw new \Exception('data must be set to group accordingly.');
         }
 
+        // reverse the data for faster processing
+        //$this->data = array_reverse($this->data, true);
+
         $this->applied = true;
+        if ($isOrdered == false) {
+            $this->data = $this->orderIt($this->data);
+        }
         $groupings = $this->groupIt($this->data, $this->groupings);
         // function can be evaluated by groups as well if they call it.
         $groupings->registerFunctions($this->fns);
@@ -112,7 +117,7 @@ class Collection
      * @param $keys
      * @return string
      */
-    protected function createOrderKey(&$data, &$keys)
+    public function createOrderKey(&$data, &$keys)
     {
         $key = '';
         foreach ($keys as $orderBy) {
@@ -131,7 +136,6 @@ class Collection
 
         return $key;
     }
-
 
     protected function toString($var)
     {
@@ -161,6 +165,38 @@ class Collection
     }
 
     /**
+     * Order structure first by group fields, then by order fields.
+     * @param $structure
+     * @return mixed
+     */
+    private function orderIt(&$structure)
+    {
+        $self = $this;
+        // for ordering, include the order bys.
+        $groupings = array_merge($this->groupings, $this->orderBys);
+        $groupOrderBys = $this->groupOrderBys;
+        usort($structure, function($a,$b) use ($self, $groupings, $groupOrderBys) {
+            // sort by al levels:
+            foreach($groupings as $caption => $orderBys) {
+                if (($ka = $self->createOrderKey($a, $orderBys)) === ($kb = $self->createOrderKey($b, $orderBys))) {
+                    continue;
+                } else {
+                    // we have the diff. Sort according to asc/desc
+                    if ($groupOrderBys[$caption] === Collection::GROUP_DESCENDING) {
+                        return -strnatcmp($ka, $kb);
+                    } else {
+                        return strnatcmp($ka, $kb);
+                    }
+                }
+            }
+
+            return 0;
+        });
+
+        return $structure;
+    }
+
+    /**
      * Takes a flat array as input, and groups it recursively.
      * @param $structure array $data.
      * @param $groupArray The groups array. E.g array('first' => array('title'), 'second' => array('date', 'time'))
@@ -170,58 +206,32 @@ class Collection
     {
         // current grouping fields
         $caption = key($groupArray);
-        $groupValues = array_shift($groupArray);
-        // list($caption, $groupValues) = each($groupArray);
+        $groupValues = $groupArray[$caption];
+        unset($groupArray[$caption]);
 
-        $group = new Group($caption, $groupValues, Group::GROUP);
+        $group = new Group($caption, Group::GROUP);
         $groupings = array();
         // group the flat structure
-
 
         $c = count($structure);
         $i = -1;
         while (++$i < $c) {
             $key = ($this->createOrderKey($structure[$i], $groupValues));
             if (isset($groupings[$key])) {
-                $groupings[$key][] = $structure[$i];
+                $groupings[$key][] = & $structure[$i];
             } else {
                 $groupings[$key] = array($structure[$i]);
             }
         }
 
+        if ($groupArray) //next grouping: take the grouped array and group each subgroup:
+            while ($g = each($groupings))
+                $group->addChild($this->groupIt($g[1], $groupArray));
+        else  // the last group array is encapsulated into leaf nodes.
+            while ($g = each($groupings))
+                $group->addChild(new Group('', Group::LEAF, $g[1]));
 
-        // sort structure by generated key using group order
-
-
-        if ($this->groupOrderBys[$caption] === 1) {
-            uksort($groupings, 'strnatcmp');
-        } elseif ($this->groupOrderBys[$caption] === 2) {
-            uksort($groupings, function($a, $b) {return -strnatcmp($a, $b);});
-        } else {
-            throw new GroupingException("Expected desc or asc [defautl] for grouping.");
-        }
-
-        // group entries recursively if we have grouping criteria left
-        // foreach ($groupings as $key => $values) {
-
-        if ($groupArray) goto loop; else goto leaf;
-
-        loop:
-            $g = each($groupings);
-            if ($g === false)
-                goto endloop;
-            $group->addChild($this->groupIt($g[1], $groupArray), $g[0]);
-        goto loop;
-
-
-        leaf:
-        while ($g = each($groupings)) {
-            $child = new Group(implode('-',$groupValues), $groupValues, Group::LEAF);
-            $child->replaceChildren($g[1]);
-            $group->addChild($child);
-        }
-
-        endloop: return $group;
+        return $group;
     }
 }
 
