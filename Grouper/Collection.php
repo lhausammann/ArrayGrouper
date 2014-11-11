@@ -86,7 +86,7 @@ class Collection
 
         $this->applied = true;
         if ($order) {
-            $groupings = $this->groupItWithoutSorting($this->data, $this->groupings);
+            $groupings = $this->groupIt($this->data, $this->groupings);
         } else {
             $groupings = $this->groupItWithoutSorting($this->data, $this->groupings);
         }
@@ -230,9 +230,9 @@ class Collection
         while (++$i < $c) {
             $key = ($this->createOrderKey($structure[$i], $groupValues));
             if (isset($groupings[$key])) {
-                $groupings[$key][] = & $structure[$i];
+                $groupings[$key][] = &$structure[$i];
             } else {
-                $groupings[$key] = array();
+                $groupings[$key] = array($structure[$i]);
             }
         }
 

@@ -28,8 +28,8 @@ class ArrayCollectionTest extends \PHPUnit_Framework_TestCase  {
         for($x = 0;$x<10;$x++) {
             $coll = new Collection($this->getSetup());
             $coll->groupBy('aKey', array('year'))
-                ->groupBy('anotherKey', array('title'))
-                ->orderBy('sortKey', array('rating'));
+                ->groupBy('anotherKey', array('title'));
+                //->orderBy('sortKey', array('rating'));
             $groups = $coll->apply();
 
             $expectedYears = array(1969,2001,2004,2014,2014);
