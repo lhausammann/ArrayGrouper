@@ -216,7 +216,6 @@ class Group implements \Countable
         }
 
         $leaf = $this->getLeaf();
-        //return call_user_func_array(array($leaf->children[0], $name), $args);
         return $leaf->$name($args); // recurse
     }
 
@@ -259,7 +258,7 @@ class Group implements \Countable
     }
 
     /**
-     * Get node returns all data ordered by the the group order.
+     * Get all elements (raw data) from the group. If a group contains subgroups, all data of each subgroup are collected and returned.
      */
     public function getElements()
     {
@@ -331,7 +330,7 @@ class Group implements \Countable
            return '[' .  $r . ']';
         }
 
-    throw new GroupingException("Could not convert to string value: " . gettype($var) . is_object($var) ? get_class($var) : '');
+        throw new GroupingException("Could not convert to string value: " . gettype($var) . is_object($var) ? get_class($var) : '');
     }
 
     /**

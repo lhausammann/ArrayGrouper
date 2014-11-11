@@ -70,9 +70,9 @@ class Collection
      * @desc groups and orders all items.
      * @return array
      */
-    public function apply($data = array(), $isOrdered = false)
+    public function apply($data = array(), $order = true)
     {
-        if ($this->applied && ! $data) {
+        if ($this->applied && !$data) {
             return $this->result; // do not apply more than once
         }
 
@@ -81,18 +81,16 @@ class Collection
             $this->data = $data;
         } elseif (! $this->data) {
 
-            throw new \Exception('data must be set to group accordingly.');
+            throw new \Exception('Array of data must be set. Set it in group constructor or pass it as parameter to apply.');
         }
-
-        // reverse the data for faster processing
-        //$this->data = array_reverse($this->data, true);
 
         $this->applied = true;
-        if ($isOrdered == false) {
-            $this->data = $this->orderIt($this->data);
+        if ($order) {
+            $groupings = $this->groupItWithoutSorting($this->data, $this->groupings);
+        } else {
+            $groupings = $this->groupItWithoutSorting($this->data, $this->groupings);
         }
-        $groupings = $this->groupIt($this->data, $this->groupings);
-        // function can be evaluated by groups as well if they call it.
+
         $groupings->registerFunctions($this->fns);
         $groupings->registerExtension(new GroupExtensions());
         return $this->result = $groupings;
@@ -120,7 +118,7 @@ class Collection
     public function createOrderKey(&$data, &$keys)
     {
         $key = '';
-        foreach ($keys as $orderBy) {
+        foreach ($keys as &$orderBy) {
             if (isset($this->fns[$orderBy] )) {
                 $key .= '-' . $this->fns[$orderBy]($data);
                 continue;
@@ -165,44 +163,58 @@ class Collection
     }
 
     /**
-     * Order structure first by group fields, then by order fields.
-     * @param $structure
-     * @return mixed
-     */
-    private function orderIt(&$structure)
-    {
-        $self = $this;
-        // for ordering, include the order bys.
-        $groupings = array_merge($this->groupings, $this->orderBys);
-        $groupOrderBys = $this->groupOrderBys;
-        usort($structure, function($a,$b) use ($self, $groupings, $groupOrderBys) {
-            // sort by al levels:
-            foreach($groupings as $caption => $orderBys) {
-                if (($ka = $self->createOrderKey($a, $orderBys)) === ($kb = $self->createOrderKey($b, $orderBys))) {
-                    continue;
-                } else {
-                    // we have the diff. Sort according to asc/desc
-                    if ($groupOrderBys[$caption] === Collection::GROUP_DESCENDING) {
-                        return -strnatcmp($ka, $kb);
-                    } else {
-                        return strnatcmp($ka, $kb);
-                    }
-                }
-            }
-
-            return 0;
-        });
-
-        return $structure;
-    }
-
-    /**
      * Takes a flat array as input, and groups it recursively.
      * @param $structure array $data.
      * @param $groupArray The groups array. E.g array('first' => array('title'), 'second' => array('date', 'time'))
      * @return ShowtimesGroup A grouped tree.
      */
-    private function groupIt($structure, $groupArray)
+    private function groupIt(&$structure, $groupArray)
+    {
+        // current grouping fields
+        $caption = key($groupArray);
+        $groupValues = $groupArray[$caption];
+        unset($groupArray[$caption]);
+
+        $group = new Group($caption, Group::GROUP);
+        $groupings = array();
+        // group the flat structure
+
+        $c = count($structure);
+        $i = -1;
+        while (++$i < $c) {
+            $key = ($this->createOrderKey($structure[$i], $groupValues));
+            if (isset($groupings[$key])) {
+                $groupings[$key][] = &$structure[$i];
+            } else {
+                $groupings[$key] = array($structure[$i]);
+            }
+        }
+
+        // sort structure by generated key using group order
+        $this->groupOrderBys[$caption] === 1 ? uksort($groupings, 'strnatcmp') : uksort($groupings, function($a, $b) {return -strnatcmp($a, $b);});
+
+
+        if ($groupArray) { //next grouping: take the grouped array and group each subgroup:
+            while ($g = each($groupings))
+                $group->addChild($this->groupIt($g[1], $groupArray));
+            return $group;
+        // the last group array is encapsulated into leaf nodes
+        } else {
+            while ($g = each($groupings))
+                $group->addChild(new Group('', Group::LEAF, $g[1]));
+            return $group;
+        }
+
+        return $group;
+
+    }
+        /**
+     * Takes a flat array as input, and groups it recursively, but does not order the elements.
+     * @param $structure array $data.
+     * @param $groupArray The groups array. E.g array('first' => array('title'), 'second' => array('date', 'time'))
+     * @return ShowtimesGroup A grouped tree.
+     */
+    private function groupItWithoutSorting(&$structure, $groupArray)
     {
         // current grouping fields
         $caption = key($groupArray);
@@ -220,18 +232,22 @@ class Collection
             if (isset($groupings[$key])) {
                 $groupings[$key][] = & $structure[$i];
             } else {
-                $groupings[$key] = array($structure[$i]);
+                $groupings[$key] = array();
             }
         }
 
-        if ($groupArray) //next grouping: take the grouped array and group each subgroup:
+        if ($groupArray) { //next grouping: take the grouped array and group each subgroup:
             while ($g = each($groupings))
                 $group->addChild($this->groupIt($g[1], $groupArray));
-        else  // the last group array is encapsulated into leaf nodes.
+            return $group;
+            // the last group array is encapsulated into leaf nodes
+        } else {
             while ($g = each($groupings))
                 $group->addChild(new Group('', Group::LEAF, $g[1]));
+            return $group;
+        }
 
         return $group;
+
     }
 }
-
