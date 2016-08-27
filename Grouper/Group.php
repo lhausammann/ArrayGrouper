@@ -9,7 +9,7 @@ namespace ArrayGrouper\Grouper;
 use ArrayGrouper\Exception\GroupingException;
 use Countable;
 
-class Group implements \Countable
+class Group implements \Countable, \ArrayAccess
 {
     const ROOT = 1;
     const GROUP = 2;
@@ -24,6 +24,7 @@ class Group implements \Countable
     private static $fns = array();
 
     private static $groupExtension = null;
+    private static $groupings = null;
 
     /** tries to get the nth-child. n starts at 0. */
     public function get($n)
@@ -40,6 +41,13 @@ class Group implements \Countable
 
             $count++;
         }
+    }
+
+    /** set the groupings. Only apply must use this */
+    public function setGroups($groups) {
+        self::$groupings = $groups;
+
+        return $this; // chainable
     }
 
     /**
@@ -197,12 +205,15 @@ class Group implements \Countable
 
     public function __call($name, $args)
     {
+        // its a registered node extension then call it.
         if (self::$groupExtension && method_exists(self::$groupExtension, $name)) {
             $argument = count($args) === 1 ? $args[0] : false;
             return  self::$groupExtension->{$name}($this, $argument);
+        // its a registered function on the node. call it with the raw data (getNode()) as first argument.
         } elseif (isset(self::$fns[$name]))
         {
             return call_user_func_array(self::$fns[$name], array_merge(array($this->getNode(), $args)));
+
         } elseif ($this->type === self::LEAF) {
             if (method_exists($this->getNode(), $name)) {
                 return call_user_func_array(array($this->getNode(), $name), $args);
@@ -210,7 +221,7 @@ class Group implements \Countable
                 // call it on the first child.
                 return call_user_func_array(array($this->children[0], $name), $args);
             } else {
-
+                throw new \Exception("Call " . $name . "failied with arguments " . implode($args, ", "));
                 return;
             }
         }
@@ -324,8 +335,8 @@ class Group implements \Countable
         } elseif (is_array($var)) {
 
            $r = 'arr: ';
-            foreach ($var as $v) {
-               $r = $r . ' ' . $v;
+            foreach ($var as $k => $v) {
+               $r = $r . ' ' . $k . ": " . $v;
            }
            return '[' .  $r . ']';
         }
@@ -342,7 +353,7 @@ class Group implements \Countable
      */
     private function getField($mixed, $field)
     {
-        if ($field === false) {
+        if ($field === false && is_scalar($mixed)) {
             return $mixed;
         } elseif (is_array($mixed) && isset($mixed[$field])) {
             return $mixed[$field];
@@ -353,7 +364,33 @@ class Group implements \Countable
             $getter = 'get' . ucfirst($field);
             return $mixed->{$getter}();
         } else {
-            throw new \Exception(sprintf('Object must be array or obbject but was %s, or field must exists as extension function %s ', array(gettype($mixed, $field))));
+            throw new \Exception(sprintf('Object must be array or obbject but was %s, or field must exists as extension function %s ', array(gettype($mixed), $field)));
         }
+    }
+
+    /* Inherited functions from ArrayAccess */
+    public function offsetSet($offstet, $value) {throw new GroupingException("Collection is read-only");}
+    public function offsetUnset($offstet) {throw new GroupingException("Collection is read-only");}
+
+    public function offsetExists($offset) {
+        // offset must exist in the groupings. Note that this checking is not strict because it doesn not the level take into account, but probably good enough.
+        $ok = false;
+        foreach(self::$groupings as $g) {
+            $ok =  ($ok || in_array($offset, $g));
+        }
+        if (! $ok) {
+            throw new \Exception("key: " . $offset . ' must exist in ' .implode(self::$groupings, ","));
+        }
+
+        return true;
+    }
+
+    public function offsetGet($offset) {
+        if ($this->offsetExists($offset)) {
+
+            return $this->getField($this->getNode(), $offset);
+        }
+        exit;
+        return null;
     }
 }

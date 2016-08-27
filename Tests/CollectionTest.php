@@ -49,7 +49,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
         $collection->registerGroupingFunction('byRandom', function($element) { return rand(0,20); });
         $collection->groupBy('testGroup', array('evenUneven'));
         $collection->groupByDescending('key', array('byRandom'));
-        $groupings = $collection->apply();
+        $groupings = $collection->apply(false, true);
         $this->assertEquals($count, $groupings->count());
         $this->assertEquals($min, $groupings->min(), 'values on round  '  . ': ' . $groupings);
         $this->assertEquals($max, $groupings->max());

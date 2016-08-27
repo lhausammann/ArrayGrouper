@@ -28,9 +28,11 @@ class ArrayCollectionTest extends \PHPUnit_Framework_TestCase  {
         for($x = 0;$x<10;$x++) {
             $coll = new Collection($this->getSetup());
             $coll->groupBy('aKey', array('year'))
-                ->groupBy('anotherKey', array('title'));
-                //->orderBy('sortKey', array('rating'));
+                 ->groupBy('anotherKey', array('title'))
+                 ->orderBy('sortKey', array('rating'));
             $groups = $coll->apply();
+
+
 
             $expectedYears = array(1969,2001,2004,2014,2014);
             $expectedTitles = array('Easy Rider', 'The royal tennenbaums', 'Coffee & Cigarettes', 'A life aquatic', 'A really bad movie', 'The grand budapest hotel');
@@ -38,10 +40,14 @@ class ArrayCollectionTest extends \PHPUnit_Framework_TestCase  {
             /** @var $yearGroup \ArrayGrouper\Grouper\Group */
             foreach($groups->getChildren() as $yearGroup) {
                 $this->assertEquals ($year = array_shift($expectedYears), $yearGroup->formatCaption('%year%'));
+                // we also can access the year by directly calling
+                $this->assertEquals($yearGroup["year"], $year);
                 /** @var $titleNode \ArrayGrouper\Grouper\Group */
 
                 foreach($yearGroup->getChildren() as $titleNode) {
                     $this->assertEquals($title = array_shift($expectedTitles), $titleNode->getValue('title'));
+                    $this->assertEquals($titleNode["title"], $title);
+
                     // check each node
                     foreach($titleNode->getElements() as $node)
                     {

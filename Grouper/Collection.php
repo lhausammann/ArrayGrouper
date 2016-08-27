@@ -77,13 +77,12 @@ class Collection
         }
 
         if ($data) {
-            $this->applied = false;
             $this->data = $data;
         } elseif (! $this->data) {
 
             throw new \Exception('Array of data must be set. Set it in group constructor or pass it as parameter to apply.');
         }
-
+        $savedGroupings =  $this->groupings;
         $this->applied = true;
         if ($order) {
             $groupings = $this->groupIt($this->data, $this->groupings);
@@ -93,7 +92,7 @@ class Collection
 
         $groupings->registerFunctions($this->fns);
         $groupings->registerExtension(new GroupExtensions());
-        return $this->result = $groupings;
+        return $this->result = $groupings->setGroups($savedGroupings);
     }
 
     /**
@@ -191,6 +190,7 @@ class Collection
         }
 
         // sort structure by generated key using group order
+        // TODO: Maybe we can presort the input?
         $this->groupOrderBys[$caption] === 1 ? uksort($groupings, 'strnatcmp') : uksort($groupings, function($a, $b) {return -strnatcmp($a, $b);});
 
 
@@ -206,9 +206,9 @@ class Collection
         }
 
         return $group;
-
     }
-        /**
+    
+    /**
      * Takes a flat array as input, and groups it recursively, but does not order the elements.
      * @param $structure array $data.
      * @param $groupArray The groups array. E.g array('first' => array('title'), 'second' => array('date', 'time'))
@@ -237,7 +237,6 @@ class Collection
         }
 
         if ($groupArray) { //next grouping: take the grouped array and group each subgroup:
-            while ($g = each($groupings))
                 $group->addChild($this->groupIt($g[1], $groupArray));
             return $group;
             // the last group array is encapsulated into leaf nodes

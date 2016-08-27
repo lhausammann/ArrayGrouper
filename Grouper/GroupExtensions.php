@@ -7,7 +7,7 @@
  */
 
 namespace ArrayGrouper\Grouper;
-
+use ArrayGrouper\Exception\GroupingException;
 
 class GroupExtensions {
 
