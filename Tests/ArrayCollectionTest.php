@@ -5,9 +5,9 @@
  * Date: 07.11.14
  * Time: 19:44
  */
-namespace ArrayGrouper\Tests;
+namespace ArrayGrouper\s;
 use ArrayGrouper\Grouper\Collection;
-class ArrayCollectionTest extends \PHPUnit_Framework_TestCase  {
+class ArrayCollectionTestt extends \PHPUnit_Framework_TestCase  {
 
     public function getSetup() {
         $arr = array(
@@ -20,8 +20,14 @@ class ArrayCollectionTest extends \PHPUnit_Framework_TestCase  {
             array('title' => 'A really bad movie',          'director' => 'Max Maxxen',         'year' => '2014', 'rating'  => 0.1),
         );
 
+
+        for ($i = 0; $i<10000;$i++) {
+            $arr[] = array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014',  'rating' => 4.1);  
+        }
+
         shuffle($arr);
         return $arr;
+        
     }
 
     public function testCaptionByYearAndTitle() {
@@ -30,8 +36,7 @@ class ArrayCollectionTest extends \PHPUnit_Framework_TestCase  {
             $coll->groupBy('aKey', array('year'))
                  ->groupBy('anotherKey', array('title'))
                  ->orderBy('sortKey', array('rating'));
-            $groups = $coll->apply();
-
+            $groups = $coll->apply(null,false);
 
 
             $expectedYears = array(1969,2001,2004,2014,2014);
@@ -39,65 +44,49 @@ class ArrayCollectionTest extends \PHPUnit_Framework_TestCase  {
 
             /** @var $yearGroup \ArrayGrouper\Grouper\Group */
             foreach($groups->getChildren() as $yearGroup) {
-                $this->assertEquals ($year = array_shift($expectedYears), $yearGroup->formatCaption('%year%'));
+                $yearIdx = array_search($year = $yearGroup->formatCaption('%year%'), $expectedYears);
+                if ($yearIdx !== false)
+                    $year = array_splice($expectedYears, $yearIdx)[0];
                 // we also can access the year by directly calling
                 $this->assertEquals($yearGroup["year"], $year);
                 /** @var $titleNode \ArrayGrouper\Grouper\Group */
-
                 foreach($yearGroup->getChildren() as $titleNode) {
-                    $this->assertEquals($title = array_shift($expectedTitles), $titleNode->getValue('title'));
+                    //$this->assertEquals($title = array_shift($expectedTitles), $titleNode->getValue('title'));
+                    $titleIdx = array_search($title = $titleNode->getValue('title'), $expectedTitles);
+                    if ($titleIdx !== false) {
+                        $title = array_splice($expectedTitles, $titleIdx)[0];
+                    }
                     $this->assertEquals($titleNode["title"], $title);
 
-                    // check each node
+                    $okYear = true; $okTitle = true;
                     foreach($titleNode->getElements() as $node)
                     {
-                        $this->assertEquals($title, $node['title']);
-                        $this->assertEquals($year, $node['year']);
+                        echo $node["title"] . ": " . $node["year"];
+                        $okTitle = $okTitle & $node["title"] == $title;
+                        $okYear = $okYear & $node["year"] == $year;
+                        //$this->assertEquals($title, $node['title']);
+                        //$this->assertEquals($year, $node['year']);
                     }
+
+                    $this->assertTrue($okYear == true, "not every year in group was: " . $year);
+                    $this->assertTrue($okTitle == true, "not every title in group was: " . $title);
                 }
             }
         }
     }
-}
 
-
-
-/**
-
-
-$coll = new Collection($array);
-$coll->groupBy('aKey', array('director'))
-    ->groupBy('anotherkey', array('year', 'title'))
-    ->sortBy('rating');
-$groups = $coll->apply();
-
-foreach($groups->getChildren() as $child) {
-    echo $child->formatCaption('<h1>%director%</h1>');
-    foreach ($child->getChildren() as $node) {
-        echo $node->formatCaption('%title% - %year% - %rating%') . '<br />';
+    public function _testGroupByAZTitleYear() {
+        $data = $this->getSetup();
+         $coll = new Collection($this->getSetup());
+         $coll->registerGroupingFunction("az", function ($element) { return strtoupper($element["title"]);} );
+         $coll->groupBy("az", array("az"))
+            ->groupBy('aKey', array('year'))
+            ->groupBy('anotherKey', array('title'))
+            ->orderBy('sortKey', array('rating'));
+        $groups = $coll->apply(null, false);
+        foreach ($groups->getChildren() as $group) {
+            echo $group["az"] . "\n";
+        }
+        $this->assertTrue(true);
     }
 }
-
-
-$coll = new Collection($array);
-$coll->registerGroupingFunction('century', function($arr) {
-
-    return (int) ucfirst($arr['year'] / 100 ) + 1 . ' Jh.';
-
-});
-
-$coll->groupByDescending('aKey', array('century'))
-    ->groupBy('anotherKey', array('year','title'));
-$groups = $coll->apply();
-
-foreach($groups->getChildren() as $child) {
-    echo $child->formatCaption('<h1>%century%</h1>'); // use it in caption
-    var_dump($child->min('rating'));
-
-    foreach ($child->getChildren() as $node) {
-        echo $node->formatCaption('%year% - %title%');
-        echo $node->century(); // and use it as object property
-        $node->getElements();
-    }
-}
- */

@@ -117,20 +117,41 @@ class Collection
     public function createOrderKey(&$data, &$keys)
     {
         $key = '';
-        foreach ($keys as &$orderBy) {
-            if (isset($this->fns[$orderBy] )) {
-                $key .= '-' . $this->fns[$orderBy]($data);
+        reset($keys);
+        while ($orderBy = each($keys)) {
+            if (isset($this->fns[$orderBy[1]] )) {
+                $key .= '-' . $this->fns[$orderBy[1]]($data);
                 continue;
             } elseif (is_array($data)) {
-                $key .= '-' . $data[$orderBy] ?: '0';
+                $key .= '-' . $data[$orderBy[1]] ?: '0';
                 continue;
             } elseif (is_object($data)) {
-                $method = 'get' . ucfirst($orderBy);
+                $method = 'get' . ucfirst($orderBy[1]);
                 $key .= '-' . $this->toString($data->$method());
                 continue;
             }
         }
+        reset($keys);
+        return $key;
+    }
 
+    public function createOrderKey2(&$data, &$keys)
+    {
+        $key = '';
+        foreach($keys as &$orderBy) {
+            
+            if (!$this->fns && is_array($data)) {
+                $key .= '-' . $data[$orderBy] ?: '0';
+                continue;
+            } elseif (!$this->fns && is_object($data)) {
+                $method = 'get' . ucfirst($orderBy);
+                $key .= '-' . $this->toString($data->$method());
+                continue;
+            } elseif (isset($this->fns[$orderBy])) {
+                $key .= '-' . $this->fns[$orderBy]($data);
+                continue;
+            }
+        }
         return $key;
     }
 
@@ -169,6 +190,7 @@ class Collection
      */
     private function groupIt(&$structure, $groupArray)
     {
+
         // current grouping fields
         $caption = key($groupArray);
         $groupValues = $groupArray[$caption];
@@ -181,7 +203,8 @@ class Collection
         $c = count($structure);
         $i = -1;
         while (++$i < $c) {
-            $key = ($this->createOrderKey($structure[$i], $groupValues));
+            $key = ($this->createOrderKey2($structure[$i], $groupValues));
+
             if (isset($groupings[$key])) {
                 $groupings[$key][] = &$structure[$i];
             } else {
@@ -228,7 +251,8 @@ class Collection
         $c = count($structure);
         $i = -1;
         while (++$i < $c) {
-            $key = ($this->createOrderKey($structure[$i], $groupValues));
+            $key = ($this->createOrderKey2($structure[$i], $groupValues));
+
             if (isset($groupings[$key])) {
                 $groupings[$key][] = &$structure[$i];
             } else {
@@ -237,9 +261,10 @@ class Collection
         }
 
         if ($groupArray) { //next grouping: take the grouped array and group each subgroup:
+            while ($g = each($groupings))
                 $group->addChild($this->groupIt($g[1], $groupArray));
             return $group;
-            // the last group array is encapsulated into leaf nodes
+        // the last group array is encapsulated into leaf nodes
         } else {
             while ($g = each($groupings))
                 $group->addChild(new Group('', Group::LEAF, $g[1]));
@@ -247,6 +272,5 @@ class Collection
         }
 
         return $group;
-
     }
 }

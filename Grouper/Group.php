@@ -7,7 +7,6 @@
 namespace ArrayGrouper\Grouper;
 
 use ArrayGrouper\Exception\GroupingException;
-use Countable;
 
 class Group implements \Countable, \ArrayAccess
 {
@@ -91,8 +90,6 @@ class Group implements \Countable, \ArrayAccess
 
     public function addChild($child, $key = '')
     {
-        //$child->parent = $this;
-
         $this->children[] = $child;
         $child->key = $key;
         return $child;
@@ -205,6 +202,7 @@ class Group implements \Countable, \ArrayAccess
 
     public function __call($name, $args)
     {
+
         // its a registered node extension then call it.
         if (self::$groupExtension && method_exists(self::$groupExtension, $name)) {
             $argument = count($args) === 1 ? $args[0] : false;
@@ -252,6 +250,7 @@ class Group implements \Countable, \ArrayAccess
      */
     public function getValue($field = false, $node = null)
     {
+
         $node = $node !== null ? $node : $this->getNode();
         return $this->getField($node, $field);
     }
@@ -278,7 +277,7 @@ class Group implements \Countable, \ArrayAccess
         return $this->type === self::LEAF ? $this->children : $this->retrieveElements($a);
     }
 
-    public function getLeafNodes(Group &$group = null, &$data = array())
+    public function getLeafNodes(Group $group = null, $data = array())
     {
         if (! $group) {
             $group = $this;
@@ -364,11 +363,12 @@ class Group implements \Countable, \ArrayAccess
             $getter = 'get' . ucfirst($field);
             return $mixed->{$getter}();
         } else {
-            throw new \Exception(sprintf('Object must be array or obbject but was %s, or field must exists as extension function %s ', array(gettype($mixed), $field)));
+            throw new \Exception(sprintf('Object of type %s must be array or object or field %s must exists as extension function', array(gettype($mixed), $field)));
         }
     }
 
-    /* Inherited functions from ArrayAccess */
+
+    /* -- Inherited functions from ArrayAccess -- */
     public function offsetSet($offstet, $value) {throw new GroupingException("Collection is read-only");}
     public function offsetUnset($offstet) {throw new GroupingException("Collection is read-only");}
 

@@ -13,5 +13,9 @@
         "psr-4":{
             "ArrayGrouper\\Grouper\\":[ "Grouper/", ""]
         }
+    },
+
+    "require-dev": {
+        "phpunit/phpunit": "5.5.*"
     }
 }

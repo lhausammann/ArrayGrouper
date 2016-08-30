@@ -24,8 +24,8 @@ class GroupExtensions {
     public function sum(Group $group, $field) {
         $sum = 0;
         $leafs = $group->getLeafNodes();
-        foreach($leafs as $i =>  $leaf) {
-            foreach($leaf->getChildren() as $child) {
+        foreach($leafs as $i =>  &$leaf) {
+            foreach($leaf->getChildren() as &$child) {
                 $sum += $leaf->getValue($field, $child);
             }
         }
@@ -65,7 +65,7 @@ class GroupExtensions {
                $current =  $this->$call($current, $this->groupFn($child, $field, $evaluation), $group);
             } else {
                 $nodes = $group->getElements();
-                foreach ($nodes as $node) {
+                foreach ($nodes as &$node) {
                     $value = $group->getValue($field, $node);
                     $current =  $this->$call($current, $value, $group);
                 }
