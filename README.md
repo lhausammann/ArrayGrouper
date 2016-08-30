@@ -8,6 +8,7 @@ Group structured array entries on multiple levels.
 
 *Example*
 
+```php
 $array = array(
     array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014',  'rating' => 4.0),
     array('title' => 'Easy Rider',                  'director' => 'Dennis Hopper',      'year' => '1969',  'rating' => 4.2),
@@ -32,6 +33,6 @@ foreach($groups->getChildren() as $child) {
         echo $node->formatCaption('%title% - %year% - %rating%') . '<br />';
     }
 }
-
+```
 
 
