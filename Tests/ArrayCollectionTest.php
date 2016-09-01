@@ -21,7 +21,7 @@ class ArrayCollectionTestt extends \PHPUnit_Framework_TestCase  {
         );
 
 
-        for ($i = 0; $i<10000;$i++) {
+        for ($i = 0; $i<50000;$i++) {
             $arr[] = array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014',  'rating' => 4.1);  
         }
 
@@ -75,7 +75,7 @@ class ArrayCollectionTestt extends \PHPUnit_Framework_TestCase  {
         }
     }
 
-    public function _testGroupByAZTitleYear() {
+    public function testGroupByAZTitleYear() {
         $data = $this->getSetup();
          $coll = new Collection($this->getSetup());
          $coll->registerGroupingFunction("az", function ($element) { return strtoupper($element["title"]);} );
@@ -89,4 +89,37 @@ class ArrayCollectionTestt extends \PHPUnit_Framework_TestCase  {
         }
         $this->assertTrue(true);
     }
+
+    public function testDynamicCenturyFieldShouldCreateCenturyGroup() {
+        /** custom grouping */
+        $arr = array(
+            array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014',  'rating' => 4.1),
+            array('title' => 'Easy Rider',                  'director' => 'Dennis Hopper',      'year' => '1969',  'rating' => 4.2),
+            array('title' => 'Coffee & Cigarettes',         'director' => 'Jim Jarmush',        'year' => '2004', 'rating'  => 3.7),
+            array('title' => 'A life aquatic',              'director' => 'Wes Anderson',       'year' => '2014', 'rating'  => 4.1),
+            array('title' => 'The royal tennenbaums',       'director' => 'Wes Anderson',       'year' => '2001', 'rating'  => 3.7),
+            array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014', 'rating'  => 4.1),
+            array('title' => 'A really bad movie',          'director' => 'Max Maxxen',         'year' => '2014', 'rating'  => 0.1),
+        );
+        $arr = $this->getSetup();
+        $coll = new Collection($arr);
+
+        $coll->registerGroupingFunction('century', function($arr) {
+
+            return (int) ucfirst($arr['year'] / 100 ) + 1 ; // 20 / 21 (century)
+        });
+
+        $expectedCenturies = array(21,20);
+
+        $coll->groupByDescending('centuryGroup', array('century'))
+             ->groupBy('anotherKey', array('year','title'));
+        $groups = $coll->apply();
+
+        foreach($groups->getChildren() as $child) {
+            $expected = array_shift($expectedCenturies);
+            $this->assertTrue($expected == $child['century']);
+            
+        }
+    }
+        
 }

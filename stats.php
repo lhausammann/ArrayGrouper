@@ -17,7 +17,8 @@ function setUp2Levels()
         $collection->groupByDescending('key', array('byRandom'));
         $collection->groupBy('testGroup', array('evenUneven'));
         $collection->groupByDescending('key2', array('byRandom'));
-        $collection->apply($array, false);
+        $G =$collection->apply($array);
+        echo $G;
     }
 
     return microtime(true) - $time - $shuffleTime;
@@ -25,4 +26,4 @@ function setUp2Levels()
 
 echo 'setting up  1000 times a structured group using two functions took:' . setUp2Levels() . ' seconds';
 echo '<hr />';
-echo 'getting the first node took:' . '';
+

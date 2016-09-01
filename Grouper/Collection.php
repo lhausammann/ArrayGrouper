@@ -139,19 +139,19 @@ class Collection
     {
         $key = '';
         foreach($keys as &$orderBy) {
-            
-            if (!$this->fns && is_array($data)) {
+            if (isset($this->fns[$orderBy])) {
+                $key .= '-' . $this->fns[$orderBy]($data);
+                continue;
+            } elseif (is_array($data)) {
                 $key .= '-' . $data[$orderBy] ?: '0';
                 continue;
-            } elseif (!$this->fns && is_object($data)) {
+            } elseif (is_object($data)) {
                 $method = 'get' . ucfirst($orderBy);
                 $key .= '-' . $this->toString($data->$method());
                 continue;
-            } elseif (isset($this->fns[$orderBy])) {
-                $key .= '-' . $this->fns[$orderBy]($data);
-                continue;
-            }
+            }                
         }
+
         return $key;
     }
 

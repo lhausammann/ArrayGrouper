@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Luzius Hausammann
- * Date: 28.10.14
- * Time: 20:48
- */
+
 
 namespace ArrayGrouper\Tests;
 use ArrayGrouper\Grouper\Collection;
@@ -29,6 +24,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
         }
         $this->assertEquals(2, $groupings->count(false));
         $this->assertEquals(10, $groupings->count());
+        $this->assertEquals(9, $groupings->max());
         $this->assertEquals(0, $groupings->min(), 'Group: ' . $groupings);
     }
 

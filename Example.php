@@ -20,11 +20,33 @@ $array = array(
     array('title' => 'The royal tennenbaums',       'director' => 'Wes Anderson',       'year' => '2001', 'rating'  => 3.7),
     array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014', 'rating'  => 4.1),
     array('title' => 'A really bad movie',          'director' => 'Max Maxxen',         'year' => '2014', 'rating'  => 0.1),
-
 );
 
 shuffle($array);
 
+
+/** custom grouping */
+$coll = new Collection($array);
+$coll->registerGroupingFunction('century', function($arr) {
+
+    return (int) ucfirst($arr['year'] / 100 ) + 1 . ' Jh.';
+
+});
+
+
+
+$coll->groupByDescending('centuryGroup', array('century'))
+     ->groupBy('anotherKey', array('year','title'));
+$groups = $coll->apply();
+
+foreach($groups->getChildren() as $child) {
+    echo $child->formatCaption('<h1>%century%</h1>'); // use it in caption
+    foreach ($child->getChildren() as $node) {
+        echo $node->formatCaption('%year% - %title% (%century%)<br />');
+    }
+}
+
+echo "<hr />";
 $coll = new Collection($array);
 $coll->groupBy('key', array('year', 'title'));
 $groups = $coll->apply();
@@ -50,7 +72,8 @@ foreach($groups->getChildren() as $child) {
 
 $coll = new Collection($array);
 $coll->groupBy('aKey', array('director'))
-    ->groupBy('anotherkey', array('year', 'title'));
+    ->groupBy('anotherkey', array('year', 'title'))
+    ->orderByDescending('key', array('rating'));
 
 $groups = $coll->apply();
 
@@ -62,27 +85,6 @@ foreach($groups->getChildren() as $child) {
     }
 }
 
-
-/** custom grouping */
-$coll = new Collection($array);
-$coll->registerGroupingFunction('century', function($arr) {
-
-    return (int) ucfirst($arr['year'] / 100 ) + 1 . ' Jh.';
-
-});
-
-$coll->groupByDescending('aKey', array('century'))
-     ->groupBy('anotherKey', array('year','title'));
-$groups = $coll->apply();
-
-foreach($groups->getChildren() as $child) {
-    echo $child->formatCaption('<h1>%century%</h1>'); // use it in caption
-
-    foreach ($child->getChildren() as $node) {
-        echo $node->formatCaption('%year% - %title%');
-        echo $node->century(); // and use it as object property
-    }
-}
 
 $coll = new Collection($array);
 $coll->groupByDescending('aKey', array('year'))
