@@ -38,7 +38,7 @@ foreach($groups->getChildren() as $child) {
 }
 ```
 
-*Outputs:*
+*Outputs*
 
 # Dennis Hopper
 
@@ -83,6 +83,7 @@ $coll->registerGroupingFunction('century', function($arr) {
     return (int) ucfirst($arr['year'] / 100 ) + 1 . ' Jh.';
 
 });
+```
 
 *Outputs:*
 
