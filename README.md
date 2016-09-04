@@ -4,8 +4,8 @@
 ArrayGrouper
 ============
 
-Group structured array entries on multiple levels. Supported types are objects and arrays (and values when using custom grouping).
-Each node data is encapsulated in a class which provides methods for formatting and ArrayAccess methods.
+Group structured array  entries on multiple levels.
+Each group node data is encapsulated in a class which provides methods for formatting. It implements the ArrayAccess interface.
 
 *Example simple array grouping*
 
@@ -83,6 +83,17 @@ $coll->registerGroupingFunction('century', function($arr) {
     return (int) ucfirst($arr['year'] / 100 ) + 1 . ' Jh.';
 
 });
+
+$coll->groupByDescending('centuryGroup', array('century')) // use the defined century function as regular field.
+     ->groupBy('anotherKey', array('year','title'));
+$groups = $coll->apply();
+
+foreach($groups->getChildren() as $child) {
+    echo $child->formatCaption('<h1>%century%</h1>'); // use it in caption
+    foreach ($child->getChildren() as $node) {
+        echo $node->formatCaption('%year% - %title% (%century%)<br />');
+    }
+}
 ```
 
 *Outputs:*
@@ -100,15 +111,3 @@ $coll->registerGroupingFunction('century', function($arr) {
 1969 - Easy Rider (20 Jh.)
 
 
-$coll->groupByDescending('centuryGroup', array('century'))
-     ->groupBy('anotherKey', array('year','title'));
-$groups = $coll->apply();
-
-foreach($groups->getChildren() as $child) {
-    echo $child->formatCaption('<h1>%century%</h1>'); // use it in caption
-    foreach ($child->getChildren() as $node) {
-        echo $node->formatCaption('%year% - %title% (%century%)<br />');
-    }
-}
-
-```
