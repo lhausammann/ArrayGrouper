@@ -11,7 +11,8 @@
 
     "autoload":{
         "psr-4":{
-            "ArrayGrouper\\Grouper\\":[ "Grouper/", ""]
+            "ArrayGrouper\\Grouper\\":[ "Grouper/", ""],
+            "ArrayGrouper\\Exception\\":[ "Exception/", ""]
         }
     },
 

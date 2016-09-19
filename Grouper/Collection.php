@@ -3,11 +3,10 @@
  * Utility class to sort a Collection for a listing.
  * $coll = new Collection($showtimes);
  * $coll->orderBy('title', projection);
- *
  */
 
 namespace ArrayGrouper\Grouper;
-use ArrayGrouper\Exception\GroupingException;
+use \ArrayGrouper\Exception\GroupingException;
 use ArrayGrouper\Grouper\GroupExtensions;
 use ArrayGrouper\Grouper\Group;
 /**
@@ -75,6 +74,9 @@ class Collection
         if ($this->applied && !$data) {
             return $this->result; // do not apply more than once
         }
+        if (! $this->groupings) {
+            throw new GroupingException("Must have at least one group or order field. Use groupBy, groupByDescending, orderBy, orderByDescending before calling apply.");
+        }
 
         if ($data) {
             $this->data = $data;
@@ -82,7 +84,6 @@ class Collection
 
             throw new \Exception('Array of data must be set. Set it in group constructor or pass it as parameter to apply.');
         }
-        $savedGroupings =  $this->groupings;
         $this->applied = true;
         if ($order) {
             $groupings = $this->groupIt($this->data, $this->groupings);
@@ -92,47 +93,18 @@ class Collection
 
         $groupings->registerFunctions($this->fns);
         $groupings->registerExtension(new GroupExtensions());
-        return $this->result = $groupings->setGroups($savedGroupings);
+        return $this->result = $groupings->setGroups($this->groupings);
     }
 
     /**
      * Registers a function to use for grouping by providing a key.
      * @param $name The name to use when using groupBy.
-     * @param $group The Root Entity which is accessed by the function.
-     * TODO: Make this more clear, e.g. use movie.releaseDate instead of just movie
      * @param $fn The callback function which must generate and return the key for grouping. The current show is given as parameter.
      */
     public function registerGroupingFunction($name, $fn)
     {
         $this->fns[$name] = $fn;
         return $this;
-    }
-
-    /**
-     * Creates a key which is used for ordering and grouping all results.
-     * @param $data
-     * @param $keys
-     * @return string
-     */
-    public function createOrderKey(&$data, &$keys)
-    {
-        $key = '';
-        reset($keys);
-        while ($orderBy = each($keys)) {
-            if (isset($this->fns[$orderBy[1]] )) {
-                $key .= '-' . $this->fns[$orderBy[1]]($data);
-                continue;
-            } elseif (is_array($data)) {
-                $key .= '-' . $data[$orderBy[1]] ?: '0';
-                continue;
-            } elseif (is_object($data)) {
-                $method = 'get' . ucfirst($orderBy[1]);
-                $key .= '-' . $this->toString($data->$method());
-                continue;
-            }
-        }
-        reset($keys);
-        return $key;
     }
 
     public function createOrderKey2(&$data, &$keys)

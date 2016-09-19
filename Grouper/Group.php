@@ -1,16 +1,18 @@
 <?php
 /**
- * A grouped collection.
+ * A group reperesents a node which can be grouped.
+ * Every group has children. If its a Group node, the child nodes are of the same type. If its a leave node, its children are an array * of the initial raw data (scalar, arrays or objects).
+ * Each group node provides methods to access its (first) raw data by either function calls or array access interface.
+ * 
  * TODOs
  *   - Rename nodes to 'Elements'
  */
 namespace ArrayGrouper\Grouper;
 
-use ArrayGrouper\Exception\GroupingException;
+use \ArrayGrouper\Exception\GroupingException;
 
 class Group implements \Countable, \ArrayAccess
 {
-    const ROOT = 1;
     const GROUP = 2;
     const LEAF = 3;
 
@@ -19,28 +21,12 @@ class Group implements \Countable, \ArrayAccess
     private $type;
     private $children = array();
     private $caption = '';
-    private $key;
+    private $groupingFields = array(); // grouping fields contains allwowed fields to group (parent fieilds merged with current fields).
+
     private static $fns = array();
 
     private static $groupExtension = null;
     private static $groupings = null;
-
-    /** tries to get the nth-child. n starts at 0. */
-    public function get($n)
-    {
-        $count = 0;
-        if (count($this->children) - 1 < $n) {
-            return null;
-        }
-
-        foreach ($this->children as $child) {
-            if ($count == $n) {
-                return $child;
-            }
-
-            $count++;
-        }
-    }
 
     /** set the groupings. Only apply must use this */
     public function setGroups($groups) {
@@ -50,7 +36,7 @@ class Group implements \Countable, \ArrayAccess
     }
 
     /**
-     * @param $caption
+     * @param $caption The name of this group
      * @param $fields
      * @param $what self::ROOT | self::GROUP | self::LEAF
      * @param $data to set data direclty on this node. only on leafs.
@@ -62,14 +48,9 @@ class Group implements \Countable, \ArrayAccess
         $this->type = $type;
     }
 
-    public function isRoot()
-    {
-        return $this->type == self::ROOT;
-    }
-
     public function isGroup()
     {
-        return $this->type == self::GROUP;
+        return $this->type != self::LEAF;
     }
 
     public function isLeaf()
@@ -82,32 +63,11 @@ class Group implements \Countable, \ArrayAccess
         return $this->caption;
     }
 
-    public function replaceChildren(array $children)
-    {
-        $this->type = self::LEAF;
-        $this->children = $children;
-    }
-
     public function addChild($child, $key = '')
     {
         $this->children[] = $child;
         $child->key = $key;
         return $child;
-    }
-
-    public function setKey($key)
-    {
-        $this->key = $key;
-    }
-
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    public function setOrderBys($orderBys)
-    {
-        $this->orderBys = array_merge($this->orderBys, $orderBys);
     }
 
     /**
@@ -139,8 +99,7 @@ class Group implements \Countable, \ArrayAccess
     }
 
     /**
-     * getNode returns the _first_ node of a group, allowing querying group properties from it.
-     * E.g if the group is grouped by title, group->getTitle() is allowed.
+     * getNode returns the _first_ element node of a group
      * @return data.
      */
     public function getNode()
@@ -148,23 +107,21 @@ class Group implements \Countable, \ArrayAccess
         if ($this->type === self::LEAF && $this->children) {
 
             return $this->children[0];
-        } elseif ($this->children) {
+        } else {
             return $this->children[0]->getNode();
         }
-
-        return null;
     }
 
     /**
      * Gets the leaf of a group.
-     * A leaf node contains the sorted data.
+     * A leaf node contains the sorted data on its children property and contains the data.
      * @return Group
      */
     public function getLeaf()
     {
         if ($this->type === self::LEAF) {
             return $this;
-        } else if ($this->children){
+        } else {
             return $this->children[0]->getLeaf();
         }
     }
@@ -200,6 +157,13 @@ class Group implements \Countable, \ArrayAccess
         self::$groupExtension = $extension;
     }
 
+
+    /**
+     * Prooagate call of a group to
+     *  - registered group extensions
+     *  - registered group functions
+     *  - methods / fields on the first leaf array in the tree (assuming we call a grouped field)  
+     */
     public function __call($name, $args)
     {
 
@@ -215,26 +179,22 @@ class Group implements \Countable, \ArrayAccess
         } elseif ($this->type === self::LEAF) {
             if (method_exists($this->getNode(), $name)) {
                 return call_user_func_array(array($this->getNode(), $name), $args);
-            } elseif ($this->children && is_object($this->children[0])) {
-                // call it on the first child.
-                return call_user_func_array(array($this->children[0], $name), $args);
             } else {
-                throw new \Exception("Call " . $name . "failied with arguments " . implode($args, ", "));
-                return;
+
+                throw new GroupingException(sprintf("Call to %s() failed (using __call): No registered extension function, field function, object method found.", $name));
             }
         }
 
-        $leaf = $this->getLeaf();
-        return $leaf->$name($args); // recurse
+        return $this->getLeaf()->$name($args); // recurse to __call again.
     }
+
 
     public function __toString()
     {
-        $string = 'Group ' . $this->caption;
+        $string = '{Group: '; 
         if ($this->children) {
-            $string .= '{';
             foreach ($this->children as $child) {
-                $string .= $this->toString($child);
+                $string .= $this->asString($child, true);
             }
 
             $string .= '}';
@@ -255,58 +215,31 @@ class Group implements \Countable, \ArrayAccess
         return $this->getField($node, $field);
     }
 
-    public function toString($child)
-    {
-        $string = " ";
-        if ($child instanceof Group) {
-
-            return $child->__toString();
-        } else {
-            // stringify objects, arrays and scalar as best as possible:
-            return $string . $this->asString($child);
-        }
-    }
-
     /**
      * Get all elements (raw data) from the group. If a group contains subgroups, all data of each subgroup are collected and returned.
      */
     public function getElements()
     {
         // start it.
-        static $a = array();
+        $a = array();
         return $this->type === self::LEAF ? $this->children : $this->retrieveElements($a);
     }
 
-    public function getLeafNodes(Group $group = null, $data = array())
-    {
-        if (! $group) {
-            $group = $this;
-        }
-
-        if ($group->type === self::LEAF) {
-            $data[] = $group;
-        } else {
-            foreach ($group->children as &$child) {
-                $data = $this->getLeafNodes($child, $data);
-            }
-        }
-
-        return $data;
-    }
+    
 
     /**
      * Returns all nodes as a flat array, order by group order.
      * @return array
      */
-    protected function retrieveElements(&$data)
-    {
-        $data = array();
+    protected function retrieveElements($data)
+    {            
         $children = $this->children;
-        foreach ($children as $showOrGroup) {
-            if (is_object($showOrGroup) && get_class($showOrGroup) === 'Group') {
-                $data = $showOrGroup->retrieveElements($data);
-            } else { // array or object or scalar
-                $data[] = $showOrGroup;
+        foreach ($children as $child) {
+            if ($child->isGroup()) {
+                $data = $child->retrieveElements($data);
+            } else { // leaf -- get the raw data.
+
+                $data = array_merge($data, $child->children);
             }
         }
 
@@ -317,20 +250,13 @@ class Group implements \Countable, \ArrayAccess
     {
         if (is_scalar($var)) {
             return 's:' . $var;
-
         } elseif (is_object($var)) {
-            if (method_exists($var, 'getName')) {
-
-                return 'n:' . $var->getName();
-            } elseif (method_exists($var, 'getId')) {
-
-                return 'id:' . $var->getId() . ',';
-            } elseif (get_class($var) === 'Date' || get_class($var) === 'DateTime') {
-
-                return $var->format('Y-m-d H:i:s');
-            } else {
-                throw new GroupingException("Could not resolve var: " . get_class($var));
-            }
+            
+            //throw new GroupingException("Could not resolve var: " . get_class($var));
+            if (method_exists($var, '__toString')) 
+                return $var->__toString();
+            return "class: " . get_class($var);
+            
         } elseif (is_array($var)) {
 
            $r = 'arr: ';
@@ -339,16 +265,14 @@ class Group implements \Countable, \ArrayAccess
            }
            return '[' .  $r . ']';
         }
-
-        throw new GroupingException("Could not convert to string value: " . gettype($var) . is_object($var) ? get_class($var) : '');
     }
 
     /**
      * Tries to get the 'field' from a group or a raw element.
      * If a group has registered functions on it, it accesses them as well.
-     * @param $mixed
-     * @param $field
-     * @return mixed
+     * @param $mixed  the value to check against. Could be scalar, array or object.
+     * @param $field  the field to get from the value (if scalar, this must not be set.)
+     * @return mixed  the value of the field which is accessed from $mixed.
      */
     private function getField($mixed, $field)
     {
@@ -359,11 +283,11 @@ class Group implements \Countable, \ArrayAccess
         } elseif(isset(self::$fns[$field])) {
             $call = self::$fns[$field];
             return $call($mixed);
-        } elseif (is_object($mixed)) {
-            $getter = 'get' . ucfirst($field);
+        } elseif (is_object($mixed) && method_exists($mixed, $getter = 'get' . ucfirst($field))) {
+            
             return $mixed->{$getter}();
         } else {
-            throw new \Exception(sprintf('Object of type %s must be array or object or field %s must exists as extension function', array(gettype($mixed), $field)));
+            throw new GroupingException(sprintf('Object of type %s must be array or object or field %s must exists as extension function', gettype($mixed), $field));
         }
     }
 
@@ -372,9 +296,10 @@ class Group implements \Countable, \ArrayAccess
     public function offsetSet($offstet, $value) {throw new GroupingException("Collection is read-only");}
     public function offsetUnset($offstet) {throw new GroupingException("Collection is read-only");}
 
+    // FIXME
     public function offsetExists($offset) {
-        // offset must exist in the groupings. Note that this checking is not strict because it doesn not the level take into account, but probably good enough.
-        $ok = false;
+        // offset must exist in the group. Note that this checking is not strict because it doesn not the level take into account, but probably good enough.
+        $ok = true;
         foreach(self::$groupings as $g) {
             $ok =  ($ok || in_array($offset, $g));
         }
@@ -390,7 +315,6 @@ class Group implements \Countable, \ArrayAccess
 
             return $this->getField($this->getNode(), $offset);
         }
-        exit;
         return null;
     }
 }

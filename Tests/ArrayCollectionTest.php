@@ -5,9 +5,12 @@
  * Date: 07.11.14
  * Time: 19:44
  */
-namespace ArrayGrouper\s;
+namespace ArrayGrouper\Tests;
 use ArrayGrouper\Grouper\Collection;
-class ArrayCollectionTestt extends \PHPUnit_Framework_TestCase  {
+use ArrayGrouper\Grouper\Group;
+use ArrayGrouper\Exception\GroupingException;
+
+class ArrayCollectionTestt  extends \PHPUnit_Framework_TestCase  {
 
     public function getSetup() {
         $arr = array(
@@ -21,7 +24,7 @@ class ArrayCollectionTestt extends \PHPUnit_Framework_TestCase  {
         );
 
 
-        for ($i = 0; $i<50000;$i++) {
+        for ($i = 0; $i<5000;$i++) {
             $arr[] = array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014',  'rating' => 4.1);  
         }
 
@@ -61,11 +64,8 @@ class ArrayCollectionTestt extends \PHPUnit_Framework_TestCase  {
                     $okYear = true; $okTitle = true;
                     foreach($titleNode->getElements() as $node)
                     {
-                        echo $node["title"] . ": " . $node["year"];
                         $okTitle = $okTitle & $node["title"] == $title;
                         $okYear = $okYear & $node["year"] == $year;
-                        //$this->assertEquals($title, $node['title']);
-                        //$this->assertEquals($year, $node['year']);
                     }
 
                     $this->assertTrue($okYear == true, "not every year in group was: " . $year);
@@ -75,22 +75,8 @@ class ArrayCollectionTestt extends \PHPUnit_Framework_TestCase  {
         }
     }
 
-    public function testGroupByAZTitleYear() {
-        $data = $this->getSetup();
-         $coll = new Collection($this->getSetup());
-         $coll->registerGroupingFunction("az", function ($element) { return strtoupper($element["title"]);} );
-         $coll->groupBy("az", array("az"))
-            ->groupBy('aKey', array('year'))
-            ->groupBy('anotherKey', array('title'))
-            ->orderBy('sortKey', array('rating'));
-        $groups = $coll->apply(null, false);
-        foreach ($groups->getChildren() as $group) {
-            echo $group["az"] . "\n";
-        }
-        $this->assertTrue(true);
-    }
 
-    public function testDynamicCenturyFieldShouldCreateCenturyGroup() {
+    public function testDynamicCenturyFieldCanGroup() {
         /** custom grouping */
         $arr = array(
             array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014',  'rating' => 4.1),
@@ -120,6 +106,19 @@ class ArrayCollectionTestt extends \PHPUnit_Framework_TestCase  {
             $this->assertTrue($expected == $child['century']);
             
         }
+    }
+    // this method is just silly
+    public function testGetCaption() {
+        $coll = new Collection($this->getSetup());
+        $group = $coll->groupBy("title", array("title"))->apply();
+        $this->assertEquals("title", $group->getCaption()); 
+        }
+
+    public function testToString() {
+        $group = new Group("group", Group::LEAF, $this->getSetup());
+        $s = $group->__toString();
+        $this->assertContains("arr:", $s, "Group String representation failed for array children: No array found");
+        $this->assertContains("Group", $s, "Group String representaton failed for array children: No group found.");
     }
         
 }
