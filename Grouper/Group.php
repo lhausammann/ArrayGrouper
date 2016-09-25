@@ -7,9 +7,11 @@
  * TODOs
  *   - Rename nodes to 'Elements'
  */
+
 namespace ArrayGrouper\Grouper;
 
 use \ArrayGrouper\Exception\GroupingException;
+
 
 class Group implements \Countable, \ArrayAccess
 {
@@ -23,14 +25,14 @@ class Group implements \Countable, \ArrayAccess
     private $caption = '';
     private $groupingFields = array(); // grouping fields contains allwowed fields to group (parent fieilds merged with current fields).
 
-    private static $fns = array();
-
-    private static $groupExtension = null;
-    private static $groupings = null;
+    private $groupInfo;
+    //private static $fns = array();
+    //private static $groupExtension = null;
+    //private static $groupings = null;
 
     /** set the groupings. Only apply must use this */
     public function setGroups($groups) {
-        self::$groupings = $groups;
+        $this->groupInfo->groupings = $groups;
 
         return $this; // chainable
     }
@@ -41,11 +43,12 @@ class Group implements \Countable, \ArrayAccess
      * @param $what self::ROOT | self::GROUP | self::LEAF
      * @param $data to set data direclty on this node. only on leafs.
      */
-    public function __construct($caption, $type = self::GROUP, array $data = null)
+    public function __construct($caption, $type = self::GROUP, array $data = null, $groupInfo)
     {
         $this->caption = $caption;
         $this->children = $data;
         $this->type = $type;
+        $this->groupInfo = $groupInfo;
     }
 
     public function isGroup()
@@ -136,7 +139,7 @@ class Group implements \Countable, \ArrayAccess
         $node = $node ?: $this->getNode();
         $replacements = $stringWithPlaceholders;
         $pattern = '/%([a-z]++)%/i';
-        $hasFn = count(self::$fns);
+        $hasFn = count($this->groupInfo->fns);
         $matches = array();
         preg_match_all($pattern, $stringWithPlaceholders, $matches);
         foreach ($matches[0] as $i => $field) {
@@ -149,12 +152,12 @@ class Group implements \Countable, \ArrayAccess
 
     public function registerFunctions($fns)
     {
-        self::$fns = $fns;
+        $this->groupInfo->fns = $fns;
     }
 
     public function registerExtension($extension)
     {
-        self::$groupExtension = $extension;
+        $this->groupInfo->groupExtension = $extension;
     }
 
 
@@ -168,13 +171,13 @@ class Group implements \Countable, \ArrayAccess
     {
 
         // its a registered node extension then call it.
-        if (self::$groupExtension && method_exists(self::$groupExtension, $name)) {
+        if ($this->groupInfo->groupExtension && method_exists($this->groupInfo->groupExtension, $name)) {
             $argument = count($args) === 1 ? $args[0] : false;
-            return  self::$groupExtension->{$name}($this, $argument);
+            return  $this->groupInfo->groupExtension->{$name}($this, $argument);
         // its a registered function on the node. call it with the raw data (getNode()) as first argument.
-        } elseif (isset(self::$fns[$name]))
+        } elseif (isset($this->groupInfo->fns[$name]))
         {
-            return call_user_func_array(self::$fns[$name], array_merge(array($this->getNode(), $args)));
+            return call_user_func_array($this->groupInfo->fns[$name], array_merge(array($this->getNode(), $args)));
 
         } elseif ($this->type === self::LEAF) {
             if (method_exists($this->getNode(), $name)) {
@@ -280,8 +283,8 @@ class Group implements \Countable, \ArrayAccess
             return $mixed;
         } elseif (is_array($mixed) && isset($mixed[$field])) {
             return $mixed[$field];
-        } elseif(isset(self::$fns[$field])) {
-            $call = self::$fns[$field];
+        } elseif(isset($this->groupInfo->fns[$field])) {
+            $call = $this->groupInfo->fns[$field];
             return $call($mixed);
         } elseif (is_object($mixed) && method_exists($mixed, $getter = 'get' . ucfirst($field))) {
             
@@ -300,7 +303,7 @@ class Group implements \Countable, \ArrayAccess
     public function offsetExists($offset) {
         // offset must exist in the group. Note that this checking is not strict because it doesn not the level take into account, but probably good enough.
         $ok = true;
-        foreach(self::$groupings as $g) {
+        foreach($this->groupInfo->groupings as $g) {
             $ok =  ($ok || in_array($offset, $g));
         }
         if (! $ok) {

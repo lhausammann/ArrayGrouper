@@ -7,8 +7,8 @@
 
 namespace ArrayGrouper\Grouper;
 use \ArrayGrouper\Exception\GroupingException;
-use ArrayGrouper\Grouper\GroupExtensions;
-use ArrayGrouper\Grouper\Group;
+
+
 /**
  * This class allows to group a list of data.
  */
@@ -20,9 +20,12 @@ class Collection
 
     protected $result = null;
     protected $applied = false;
+    protected $groupInfo = null;
+
 
     private $orderBys = array(); //sort fields not used for grouping
     private $groupOrderBys = array(); // group order (asc, desc), also containig orderBys order.
+
 
     private $groupings = array(); // group fields
     private $fns = array(); // callback grouping functions
@@ -85,6 +88,7 @@ class Collection
             throw new \Exception('Array of data must be set. Set it in group constructor or pass it as parameter to apply.');
         }
         $this->applied = true;
+        $this->groupInfo = new GroupInfo;
         if ($order) {
             $groupings = $this->groupIt($this->data, $this->groupings);
         } else {
@@ -162,13 +166,14 @@ class Collection
      */
     private function groupIt(&$structure, $groupArray)
     {
-
+        //$groupInfo = new GroupInfo();
+        $this->groupInfo->groupings = $groupArray;
         // current grouping fields
         $caption = key($groupArray);
         $groupValues = $groupArray[$caption];
         unset($groupArray[$caption]);
 
-        $group = new Group($caption, Group::GROUP);
+        $group = new Group($caption, Group::GROUP, null, $this->groupInfo);
         $groupings = array();
         // group the flat structure
 
@@ -196,7 +201,7 @@ class Collection
         // the last group array is encapsulated into leaf nodes
         } else {
             while ($g = each($groupings))
-                $group->addChild(new Group('', Group::LEAF, $g[1]));
+                $group->addChild(new Group('', Group::LEAF, $g[1], $this->groupInfo));
             return $group;
         }
 
@@ -215,8 +220,11 @@ class Collection
         $caption = key($groupArray);
         $groupValues = $groupArray[$caption];
         unset($groupArray[$caption]);
+        //$groupInfo = new GroupInfo();
 
-        $group = new Group($caption, Group::GROUP);
+        $group = new Group($caption, Group::GROUP, null, $this->groupInfo);
+        $this->groupInfo->groupings = $groupArray;
+
         $groupings = array();
         // group the flat structure
 
@@ -234,12 +242,12 @@ class Collection
 
         if ($groupArray) { //next grouping: take the grouped array and group each subgroup:
             while ($g = each($groupings))
-                $group->addChild($this->groupIt($g[1], $groupArray));
+                $group->addChild($this->groupIt($g[1], $groupArray), $this->groupInfo);
             return $group;
         // the last group array is encapsulated into leaf nodes
         } else {
             while ($g = each($groupings))
-                $group->addChild(new Group('', Group::LEAF, $g[1]));
+                $group->addChild(new Group('', Group::LEAF, $g[1]), $this->groupInfo);
             return $group;
         }
 

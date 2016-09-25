@@ -115,7 +115,7 @@ class ArrayCollectionTestt  extends \PHPUnit_Framework_TestCase  {
         }
 
     public function testToString() {
-        $group = new Group("group", Group::LEAF, $this->getSetup());
+        $group = new Group("group", Group::LEAF, $this->getSetup(), null);
         $s = $group->__toString();
         $this->assertContains("arr:", $s, "Group String representation failed for array children: No array found");
         $this->assertContains("Group", $s, "Group String representaton failed for array children: No group found.");
