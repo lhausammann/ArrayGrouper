@@ -107,15 +107,61 @@ class ArrayCollectionTestt  extends \PHPUnit_Framework_TestCase  {
             
         }
     }
+
+
+    public function testDynamicCenturyFieldCanGroupWithIterator() {
+        /** custom grouping */
+        $arr = array(
+            array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014',  'rating' => 4.1),
+            array('title' => 'Easy Rider',                  'director' => 'Dennis Hopper',      'year' => '1969',  'rating' => 4.2),
+            array('title' => 'Coffee & Cigarettes',         'director' => 'Jim Jarmush',        'year' => '2004', 'rating'  => 3.7),
+            array('title' => 'A life aquatic',              'director' => 'Wes Anderson',       'year' => '2014', 'rating'  => 4.1),
+            array('title' => 'The royal tennenbaums',       'director' => 'Wes Anderson',       'year' => '2001', 'rating'  => 3.7),
+            array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014', 'rating'  => 4.1),
+            array('title' => 'A really bad movie',          'director' => 'Max Maxxen',         'year' => '2014', 'rating'  => 0.1),
+        );
+        $arr = $this->getSetup();
+        $coll = new Collection($arr);
+
+        $coll->registerGroupingFunction('century', function($arr) {
+
+            return (int) ucfirst($arr['year'] / 100 ) + 1 ; // 20 / 21 (century)
+        });
+
+        $expectedCenturies = array(21,20);
+
+        $coll->groupByDescending('centuryGroup', array('century'))
+             ->groupBy('anotherKey', array('year','title'));
+        $groups = $coll->apply();
+
+        foreach($groups as $child) {
+
+            $expected = array_shift($expectedCenturies);
+            $this->assertEquals($expected, $child['century']);
+            try {
+                $child["year"];
+                $this->fail("because we cannout access ungrouped field year");
+            } catch (GroupingException $e) {
+                // do nothing because we must land here...
+            }
+            foreach($child as $titleGroup) {
+                foreach ($titleGroup as $element) {
+                    $this->assertEquals($element['title'], $titleGroup['title']);
+                }
+            }
+            
+        }
+    }
+
     // this method is just silly
     public function testGetCaption() {
         $coll = new Collection($this->getSetup());
         $group = $coll->groupBy("title", array("title"))->apply();
         $this->assertEquals("title", $group->getCaption()); 
-        }
+    }
 
     public function testToString() {
-        $group = new Group("group", Group::LEAF, $this->getSetup(), null);
+        $group = new Group("group", Group::LEAF, $this->getSetup(), null, array());
         $s = $group->__toString();
         $this->assertContains("arr:", $s, "Group String representation failed for array children: No array found");
         $this->assertContains("Group", $s, "Group String representaton failed for array children: No group found.");

@@ -1,4 +1,10 @@
 <?php
+
+
+namespace ArrayGrouper\Grouper;
+
+use \ArrayGrouper\Exception\GroupingException;
+
 /**
  * A group reperesents a node which can be grouped.
  * Every group has children. If its a Group node, the child nodes are of the same type. If its a leave node, its children are an array * of the initial raw data (scalar, arrays or objects).
@@ -8,12 +14,7 @@
  *   - Rename nodes to 'Elements'
  */
 
-namespace ArrayGrouper\Grouper;
-
-use \ArrayGrouper\Exception\GroupingException;
-
-
-class Group implements \Countable, \ArrayAccess
+class Group implements \Countable, \ArrayAccess, \Iterator
 {
     const GROUP = 2;
     const LEAF = 3;
@@ -24,31 +25,25 @@ class Group implements \Countable, \ArrayAccess
     private $children = array();
     private $caption = '';
     private $groupingFields = array(); // grouping fields contains allwowed fields to group (parent fieilds merged with current fields).
+    private $groupInfo; // static shared functions and fields: registered functions, grouping functions.
 
-    private $groupInfo;
-    //private static $fns = array();
-    //private static $groupExtension = null;
-    //private static $groupings = null;
-
-    /** set the groupings. Only apply must use this */
-    public function setGroups($groups) {
-        $this->groupInfo->groupings = $groups;
-
-        return $this; // chainable
-    }
+    private $allowedFields = array();
+    private $iteratorIndex = 1; //
 
     /**
      * @param $caption The name of this group
-     * @param $fields
-     * @param $what self::ROOT | self::GROUP | self::LEAF
+     * @param $type The type of this group self::GROUP | self::LEAF
      * @param $data to set data direclty on this node. only on leafs.
+     * @param $groupInfo static shared functions on all groups
+     * @param $allowedFields Which fields can be queried on the group object and gets delegated.
      */
-    public function __construct($caption, $type = self::GROUP, array $data = null, $groupInfo)
+    public function __construct($caption, $type = self::GROUP, array $data = null, $groupInfo, $allowedFields)
     {
         $this->caption = $caption;
         $this->children = $data;
         $this->type = $type;
         $this->groupInfo = $groupInfo;
+        $this->allowedFields = $allowedFields;
     }
 
     public function isGroup()
@@ -75,10 +70,7 @@ class Group implements \Countable, \ArrayAccess
 
     /**
      * Gets the children of this group.
-     * @param bool $internal wether or not its a call for internal use when constructing the group. Because we do not want
-     * to set the the whole EntityContainer on each internal call.
-     *
-     * @return array|EntityContainer
+     * @return array
      */
     public function getChildren()
     {
@@ -100,6 +92,7 @@ class Group implements \Countable, \ArrayAccess
 
         return $total;
     }
+
 
     /**
      * getNode returns the _first_ element node of a group
@@ -296,28 +289,62 @@ class Group implements \Countable, \ArrayAccess
 
 
     /* -- Inherited functions from ArrayAccess -- */
-    public function offsetSet($offstet, $value) {throw new GroupingException("Collection is read-only");}
-    public function offsetUnset($offstet) {throw new GroupingException("Collection is read-only");}
+    public function offsetSet($offstet, $value) { throw new GroupingException("Collection is read-only"); }
+    public function offsetUnset($offstet) { throw new GroupingException("Collection is read-only"); }
 
-    // FIXME
-    public function offsetExists($offset) {
-        // offset must exist in the group. Note that this checking is not strict because it doesn not the level take into account, but probably good enough.
-        $ok = true;
-        foreach($this->groupInfo->groupings as $g) {
-            $ok =  ($ok || in_array($offset, $g));
-        }
-        if (! $ok) {
-            throw new \Exception("key: " . $offset . ' must exist in ' .implode(self::$groupings, ","));
+    /**
+     * Checks the existence of an arrayAccess group. This means it must be a field which the collection is grouped by ont that leve.
+     * @param $offset Field to check
+     * @return true if the field exists and is allowed to query
+     * @throws GroupingException if the field is not allowed to query (not grouped on that level).
+     */
+    public function offsetExists($offset) 
+    {
+        $ok = in_array($offset, $this->allowedFields);
+
+        
+        if ($ok) {
+            return true;
         }
 
-        return true;
+        throw new GroupingException("key: " . $offset . ' must exist in ' .implode($this->allowedFields, ","));
     }
 
-    public function offsetGet($offset) {
+    /**
+     * Checks if an offset exists and gets it.
+     * @param $offset the offset to check
+     * @return the field of the node if it existst
+     * @throws GroupingException if the field does not exist.
+     */
+    public function offsetGet($offset) 
+    {
         if ($this->offsetExists($offset)) {
 
             return $this->getField($this->getNode(), $offset);
         }
-        return null;
+    }
+
+    public function debugFields() 
+    {
+        echo implode($this->allowedFields, ", ");
+    }
+
+    // Iterator- TODO: use getIterator and use a custom iterator instead.
+    public function current() 
+    {
+        return $this->children[$this->iteratorIndex];
+    }
+    public function rewind() 
+    {
+        return $this->children[$this->iteratorIndex = 0];
+    }
+    public function key(){
+        return $this->iteratorIndex; 
+    }
+    public function next(){
+        return $this->children[$this->iteratorIndex++];
+    }
+    public function valid() {
+        return $this->iteratorIndex < count($this->children);
     }
 }

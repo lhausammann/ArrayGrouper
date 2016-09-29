@@ -39,11 +39,13 @@ class ObjectCollectionTestt extends \PHPUnit_Framework_TestCase  {
             $coll->groupBy('aKey', array('year'))
                  ->groupBy('anotherKey', array('title'))
                  ->orderBy('sortKey', array('rating'));
-            $groups = $coll->apply(null,true);
+            $groups = $coll->apply(null, true);
 
 
-            $expectedYears = array(1969,2001,2004,2014,2014);
-            $expectedTitles = array('Easy Rider', 'The royal tennenbaums', 'Coffee & Cigarettes', 'A life aquatic', 'A really bad movie', 'The grand budapest hotel');
+            $expectedYears = array(1969, 2001, 2004, 2014, 2014);
+            $expectedTitles = array('Easy Rider', 'The royal tennenbaums', 
+                'Coffee & Cigarettes', 'A life aquatic', 
+                'A really bad movie', 'The grand budapest hotel');
 
             /** @var $yearGroup \ArrayGrouper\Grouper\Group */
             foreach($groups->getChildren() as $yearGroup) {
@@ -143,7 +145,7 @@ class ObjectCollectionTestt extends \PHPUnit_Framework_TestCase  {
         $coll =  new Collection($this->getSetup());
         $isOk = true;
         $coll->registerGroupingFunction('customGetYear', function($i) { return $i->getYear();});
-        $group = $coll->groupByDescending(0,array("customGetYear"))
+        $group = $coll->groupByDescending(0, array("customGetYear"))
             ->groupByDescending(1,array("title"))
             ->apply();
 
@@ -151,8 +153,6 @@ class ObjectCollectionTestt extends \PHPUnit_Framework_TestCase  {
         // getElements must return the actual class, no grouping wrapper
         $this->assertContainsOnlyInstancesOf(Movie::class, $group->getElements());
         $this->assertTrue(count($this->getSetup()) == count($group->getElements()));
-        echo $group;
-        var_dump($group->getElements());
         $itemBefore = null;
 
         /* because we grouped by toString, getElements must return same toString values for each group, ordered descending. */
@@ -176,9 +176,84 @@ class ObjectCollectionTestt extends \PHPUnit_Framework_TestCase  {
     public function testFunctionCallOnGroup() {
         $coll =  new Collection($this->getSetup());
         $isOk = true;
-        $group = $coll->groupByDescending(5,array("year"))->apply();
+        $group = $coll->groupByDescending(5 ,array("year"))->apply();
         $this->assertEquals("stuff", $group->getStuff()); // propagate function call to first object
     }
+
+    public function testArrayAccessOnGroupSimple() {
+        $arr = ["2014", "2004", "2001", "1969"];
+        $coll =  new Collection($this->getSetup());
+        $isOk = true;
+        $group = $coll->groupByDescending(5 ,array("year"))
+            ->groupBy(6, array("title"))
+            ->apply();
+        echo $group->debugFields();
+        foreach ($group->getChildren() as $yearGroup) {
+            // we must have access to year.
+            $this->assertEquals(array_shift($arr), $yearGroup["year"]);
+            // fetching title is not possible on that level
+            try {
+                $yearGroup["title"];
+                $yearGroup->debugFields();
+
+                $this->fail("must not be possible to retrieve a non-group field title.");
+            } catch(GroupingException $e) {
+                // catch the excepted exception
+                $this->assertTrue(true);
+            } catch(\Exception $e) {
+                // fail on unexpected exceptions.
+                $this->fail("Exception " .$e->getMessage() . $e->getTraceAsString() . " detected.");
+            }
+            foreach ($yearGroup->getChildren() as $titleGroup) {
+                // on the title level it must be possible to fetch title
+                try {
+                   $title = $titleGroup["title"];
+
+                } catch (\Exception $e) {
+                    $this->fail("It must be possible to get title from titleGroup. Msg: " .$e->getMessage() );
+                }
+
+            }
+        }
+    }
+
+
+    public function testArrayAccessOnGroupUsingGroupingFunction() {
+        $arr = ["2014", "2004", "2001", "1969"];
+        $coll =  new Collection($this->getSetup());
+        $coll->registerGroupingFunction("customTitle", function($object) {return strtolower($object->getTitle());}); 
+        $isOk = true;
+        $group = $coll->groupByDescending(5 ,array("year"))
+            ->groupBy(6, array("customTitle"))
+            ->apply();
+        foreach ($group->getChildren() as $yearGroup) {
+            // we must have access to year.
+            $this->assertEquals(array_shift($arr), $yearGroup["year"]);
+            // fetching title is not possible on that level
+            try {
+                $yearGroup["title"];
+                $this->fail("must not be possible to retrieve a non-group field title.");
+            } catch(GroupingException $e) {
+                // catch the excepted exception
+                $this->assertTrue(true);
+            } catch(\Exception $e) {
+                // fail on unexpected exceptions.
+                $this->fail("Exception " .$e->getMessage() . $e->getTraceAsString() . " detected.");
+            }
+            foreach ($yearGroup->getChildren() as $titleGroup) {
+                // on the title level it must be possible to fetch customTitle, but not title.
+                try {
+                   $title = $titleGroup["customTitle"];
+                   $this->assertEquals($title, strtolower($titleGroup->getNode()->getTitle()));
+
+                } catch (\Exception $e) {
+                    $this->fail("It must be possible to get title from titleGroup. Msg: " .$e->getMessage() );
+                }
+                    
+            }
+        }
+    }
+
 
     /**
      * @ExpectException(GroupingException)
@@ -189,7 +264,7 @@ class ObjectCollectionTestt extends \PHPUnit_Framework_TestCase  {
             $coll->apply(); 
         } catch(GroupingException $e) {
             $this->assertTrue(true);
-            $this->assertContains("group", $e->getMessage());
+            $this->assertContains("group", $e->getMessage() . $e->getTraceAsString());
         }
     }
 
@@ -210,7 +285,6 @@ class ObjectCollectionTestt extends \PHPUnit_Framework_TestCase  {
     }
         
 }
-
 
 
 

@@ -1,17 +1,19 @@
 <?php
-/**
- * Utility class to sort a Collection for a listing.
- * $coll = new Collection($showtimes);
- * $coll->orderBy('title', projection);
- */
+
 
 namespace ArrayGrouper\Grouper;
-use \ArrayGrouper\Exception\GroupingException;
 
+use \ArrayGrouper\Exception\GroupingException;
 
 /**
  * This class allows to group a list of data.
+ * Utility class to sort a Collection for a listing.
+ * @code
+ * $coll = new Collection($showtimes);
+ * $coll->orderBy('title', projection); 
  */
+
+
 
 class Collection
 {
@@ -87,17 +89,18 @@ class Collection
 
             throw new \Exception('Array of data must be set. Set it in group constructor or pass it as parameter to apply.');
         }
+
         $this->applied = true;
         $this->groupInfo = new GroupInfo;
         if ($order) {
-            $groupings = $this->groupIt($this->data, $this->groupings);
+            $groupings = $this->groupIt($this->data, $this->groupings, array());
         } else {
-            $groupings = $this->groupItWithoutSorting($this->data, $this->groupings);
+            $groupings = $this->groupItWithoutSorting($this->data, $this->groupings, array());
         }
 
         $groupings->registerFunctions($this->fns);
         $groupings->registerExtension(new GroupExtensions());
-        return $this->result = $groupings->setGroups($this->groupings);
+        return $this->result = $groupings;
     }
 
     /**
@@ -162,9 +165,11 @@ class Collection
      * Takes a flat array as input, and groups it recursively.
      * @param $structure array $data.
      * @param $groupArray The groups array. E.g array('first' => array('title'), 'second' => array('date', 'time'))
+     * @param $processedGroupings The processed fields so far. Needed to check access on queried fields.
+     * @invariant array_merge($processedGroupings, $groupArray) = $this->groupings
      * @return ShowtimesGroup A grouped tree.
      */
-    private function groupIt(&$structure, $groupArray)
+    private function groupIt(&$structure, $groupArray, $processedGroupings)
     {
         //$groupInfo = new GroupInfo();
         $this->groupInfo->groupings = $groupArray;
@@ -173,7 +178,9 @@ class Collection
         $groupValues = $groupArray[$caption];
         unset($groupArray[$caption]);
 
-        $group = new Group($caption, Group::GROUP, null, $this->groupInfo);
+        $group = new Group($caption, Group::GROUP, null, $this->groupInfo, $processedGroupings);
+        $processedGroupings = array_merge($groupValues, $processedGroupings);
+
         $groupings = array();
         // group the flat structure
 
@@ -196,12 +203,12 @@ class Collection
 
         if ($groupArray) { //next grouping: take the grouped array and group each subgroup:
             while ($g = each($groupings))
-                $group->addChild($this->groupIt($g[1], $groupArray));
+                $group->addChild($this->groupIt($g[1], $groupArray, $processedGroupings));
             return $group;
         // the last group array is encapsulated into leaf nodes
         } else {
             while ($g = each($groupings))
-                $group->addChild(new Group('', Group::LEAF, $g[1], $this->groupInfo));
+                $group->addChild(new Group('', Group::LEAF, $g[1], $this->groupInfo, $processedGroupings));
             return $group;
         }
 
@@ -214,15 +221,17 @@ class Collection
      * @param $groupArray The groups array. E.g array('first' => array('title'), 'second' => array('date', 'time'))
      * @return ShowtimesGroup A grouped tree.
      */
-    private function groupItWithoutSorting(&$structure, $groupArray)
+    private function groupItWithoutSorting(&$structure, $groupArray, $processedGroupings)
     {
         // current grouping fields
         $caption = key($groupArray);
         $groupValues = $groupArray[$caption];
         unset($groupArray[$caption]);
         //$groupInfo = new GroupInfo();
+        $processedGroupings = array_merge($processedGroupings, $groupValues);
 
-        $group = new Group($caption, Group::GROUP, null, $this->groupInfo);
+
+        $group = new Group($caption, Group::GROUP, null, $this->groupInfo, $processedGroupings);
         $this->groupInfo->groupings = $groupArray;
 
         $groupings = array();
@@ -242,12 +251,12 @@ class Collection
 
         if ($groupArray) { //next grouping: take the grouped array and group each subgroup:
             while ($g = each($groupings))
-                $group->addChild($this->groupIt($g[1], $groupArray), $this->groupInfo);
+                $group->addChild($this->groupIt($g[1], $groupArray, $processedGroupings), $this->groupInfo);
             return $group;
         // the last group array is encapsulated into leaf nodes
         } else {
             while ($g = each($groupings))
-                $group->addChild(new Group('', Group::LEAF, $g[1]), $this->groupInfo);
+                $group->addChild(new Group('', Group::LEAF, $g[1], $processedGroupings), $this->groupInfo);
             return $group;
         }
 
