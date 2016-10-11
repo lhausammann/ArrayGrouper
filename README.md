@@ -31,9 +31,9 @@ $groups = $coll->apply();
 
 /** @var $child \ArrayGrouper\Grouper\Group */
 foreach($groups->getChildren() as $child) {
-    echo $child->formatCaption('<h1>Directed by %director%</h1>');
+    echo $child->formatCaption('<h1>%director%</h1>'); // utility function to format grouped values
     foreach ($child->getChildren() as $node) {
-        echo $node->formatCaption('%title% - %year%) . '<br />'; // also possible: $node["title"]
+        echo $node->formatCaption('%title% - %year% - %rating%') . '<br />'; // also possible: $node["title"]
     }
 }
 ```
@@ -55,7 +55,9 @@ A really bad movie - 2014 - 0.1
 #Wes Anderson
 
 The royal tennenbaums - 2001 - 3.7
+
 A life aquatic - 2014 - 4.1
+
 The grand budapest hotel - 2014 - 4
 
 
