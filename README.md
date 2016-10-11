@@ -103,13 +103,17 @@ foreach($groups->getChildren() as $child) {
 # 21 Jh.
 
 2001 - The royal tennenbaums (21 Jh.)
+
 2004 - Coffee & Cigarettes (21 Jh.)
+
 2014 - A life aquatic (21 Jh.)
+
 2014 - A really bad movie (21 Jh.)
+
 2014 - The grand budapest hotel (21 Jh.)
 
-# 20 Jh.
 
+# 20 Jh.
 1969 - Easy Rider (20 Jh.)
 
 
