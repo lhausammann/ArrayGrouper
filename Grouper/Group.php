@@ -6,11 +6,16 @@ namespace ArrayGrouper\Grouper;
 use \ArrayGrouper\Exception\GroupingException;
 
 /**
+ * Group tree structure node
+ *
  * A group reperesents a node which can be grouped.
  * Every group has children. If its a Group node, the child nodes are of the same type. If its a leave node, its children are an array * of the initial raw data (scalar, arrays or objects).
  * Each group node provides methods to access its (first) raw data by either function calls or array access interface.
- * 
- * TODOs
+ * @license ../LICENSE.md
+ *  MIT - For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
+ *
+ * @todo
  *   - Rename nodes to 'Elements'
  */
 
@@ -18,6 +23,12 @@ class Group implements \Countable, \ArrayAccess, \Iterator
 {
     const GROUP = 2;
     const LEAF = 3;
+
+    // those constants are to detect fields or node.
+    const NODE_SIGN = '@';
+    const IS_NODE = false; 
+    const VALID_FIELD = true;
+
 
     protected $orderBys = array();
 
@@ -296,32 +307,38 @@ class Group implements \Countable, \ArrayAccess, \Iterator
      * Checks the existence of an arrayAccess group. This means it must be a field which the collection is grouped by ont that leve.
      * @param $offset Field to check
      * @return true if the field exists and is allowed to query
-     * @throws GroupingException if the field is not allowed to query (not grouped on that level).
      */
     public function offsetExists($offset) 
     {
+        
         $ok = in_array($offset, $this->allowedFields);
 
-        
         if ($ok) {
-            return true;
+            return self::VALID_FIELD;
+        } elseif ($offset == self::NODE_SIGN) {
+            return self::IS_NODE; // shortcut for current node. Note that we return false instead of throwing an exception.
         }
 
         throw new GroupingException("key: " . $offset . ' must exist in ' .implode($this->allowedFields, ","));
     }
 
+
     /**
-     * Checks if an offset exists and gets it.
-     * @param $offset the offset to check
-     * @return the field of the node if it existst
-     * @throws GroupingException if the field does not exist.
-     */
+     * @param $offset fieldName | '@'
+     * @return field | NodeElement
+     * @throws GroupingException if non existing field nor @ given.
+     */    
     public function offsetGet($offset) 
     {
         if ($this->offsetExists($offset)) {
 
-            return $this->getField($this->getNode(), $offset);
-        }
+                return $this->getField($this->getNode(), $offset);
+        } 
+        // node sign was found -- otherweise exception must be thrown.
+        return $this->getNode(); // if we have 
+
+        
+
     }
 
     public function debugFields() 

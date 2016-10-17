@@ -6,6 +6,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
+         bootstrap="./Tests/bootstrap.php"
          syntaxCheck="false">
 
     <testsuites>

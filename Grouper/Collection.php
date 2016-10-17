@@ -6,14 +6,37 @@ namespace ArrayGrouper\Grouper;
 use \ArrayGrouper\Exception\GroupingException;
 
 /**
- * This class allows to group a list of data.
- * Utility class to sort a Collection for a listing.
- * @code
+ * class allows to group a list of data.
+ *
+ * <code>
+ * $movies = array(
+ *           array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014',  'rating' => 4.1),
+ *           array('title' => 'Easy Rider',                  'director' => 'Dennis Hopper',      'year' => '1969',  'rating' => 4.2),
+ *           array('title' => 'Coffee & Cigarettes',         'director' => 'Jim Jarmush',        'year' => '2004', 'rating'  => 3.7),
+ *           array('title' => 'A life aquatic',              'director' => 'Wes Anderson',       'year' => '2014', 'rating'  => 4.1),
+ *           array('title' => 'The royal tennenbaums',       'director' => 'Wes Anderson',       'year' => '2001', 'rating'  => 3.7),
+ *           array('title' => 'The grand budapest hotel',    'director' => 'Wes Anderson',       'year' => '2014', 'rating'  => 4.1),
+ *           array('title' => 'A really bad movie',          'director' => 'Max Maxxen',         'year' => '2014', 'rating'  => 0.1),
+ *       );
  * $coll = new Collection($showtimes);
- * $coll->orderBy('title', projection); 
+ * $coll->groupBy('title', year); 
+ * $coll->groupBy('director');
+ * $nodes = $collection->apply();
+ * foreach($nodes as $node) {
+ *     echo $node["title"]; // can access title on that level
+ *      foreach ($node as $director) {
+ *           echo $director['director'];
+ *           foreach ($director->getElements() as $element) {
+ *               echo $element["rating"]; // here we are on the actual node.
+ *           }
+ *      }   
+ *}
+ * </code>
+ *
+ * @license ../LICENSE.md
+ * MIT - For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
-
-
 
 class Collection
 {
@@ -166,7 +189,6 @@ class Collection
      * @param $structure array $data.
      * @param $groupArray The groups array. E.g array('first' => array('title'), 'second' => array('date', 'time'))
      * @param $processedGroupings The processed fields so far. Needed to check access on queried fields.
-     * @invariant array_merge($processedGroupings, $groupArray) = $this->groupings
      * @return ShowtimesGroup A grouped tree.
      */
     private function groupIt(&$structure, $groupArray, $processedGroupings)

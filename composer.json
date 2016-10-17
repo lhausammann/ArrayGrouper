@@ -16,8 +16,9 @@
         }
     },
 
-    "require-dev": {
+    "require": {
         "phpunit/phpunit": "5.5.*",
+        "symfony/event-dispatcher" : "3.*",
         "apigen/apigen": "4.*"
     }
 }
