@@ -21,7 +21,6 @@ $array = array(
 );
 shuffle($array);
 
-
 $coll = new Collection($array);
 $coll->groupBy('firstLevel', array('director'))
      ->groupBy('secondLevel', array('year', 'title'))
