@@ -1,9 +1,183 @@
-<mxfile host="app.diagrams.net" modified="2023-06-14T11:32:57.061Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" version="21.1.0" etag="ZmtsB8CHVcBOelWksRoR" type="github">
+<mxfile host="app.diagrams.net" modified="2023-06-14T12:09:57.774Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="rGIVljRQt0jcFp79gKQr" version="21.1.0" type="github">
   <diagram name="Seite-1" id="e1lrRxwYjya8jLB9UGfU">
-    <mxGraphModel>
+    <mxGraphModel dx="1828" dy="623" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-92" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.salesforce.com/news/wp-content/uploads/sites/3/2021/05/Salesforce-logo.jpg;" vertex="1" parent="1">
+          <mxGeometry x="-32.68" y="522.25" width="115.36" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-77" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-2" target="TyKP4U4vsr3Walb9-fn5-76">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="40" y="180" />
+              <mxPoint x="40" y="180" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-78" value="triggers" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="TyKP4U4vsr3Walb9-fn5-77">
+          <mxGeometry x="0.0474" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-2" value="formio backend&lt;br&gt;(on premise)" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="10" y="100" width="230" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-4" target="TyKP4U4vsr3Walb9-fn5-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-40" value="download csv" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="TyKP4U4vsr3Walb9-fn5-36">
+          <mxGeometry x="-0.4028" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-65" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.333;entryY=-0.025;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-4" target="TyKP4U4vsr3Walb9-fn5-60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-66" value="renders forms" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="TyKP4U4vsr3Walb9-fn5-65">
+          <mxGeometry x="0.1215" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-4" value="cms" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="330" y="360" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-5" value="nora" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="440" y="360" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-59" value="&amp;lt;&amp;lt;uses&amp;gt;&amp;gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.909;entryY=0.321;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-6" target="TyKP4U4vsr3Walb9-fn5-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-6" value="Formalist" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#FFFFCC;" vertex="1" parent="1">
+          <mxGeometry x="370" y="70" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-70" value="full privileged access" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.457;entryY=0.079;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-9" target="TyKP4U4vsr3Walb9-fn5-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-9" value="formio Administrator User&lt;br&gt;(services.mmz)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="-40" y="20" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-27" value="CMS/Nora User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="560" y="370" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-39" value="API" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="385" y="170" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-41" value="formbuilder" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="80" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-42" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-5" target="TyKP4U4vsr3Walb9-fn5-41">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="600" y="400" />
+              <mxPoint x="600" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-43" value="create form" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="TyKP4U4vsr3Walb9-fn5-42">
+          <mxGeometry x="-0.0776" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-44" target="TyKP4U4vsr3Walb9-fn5-39">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="310" y="390" />
+              <mxPoint x="310" y="180" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-46" value="downlaod csv,&lt;br&gt;list forms" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="TyKP4U4vsr3Walb9-fn5-45">
+          <mxGeometry x="0.0441" y="-3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-44" value="external user&lt;br&gt;(Augenzeuge,&lt;br&gt;mini Chuchi,&lt;br&gt;...)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="270" y="360" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-48" value="Azure Auth (CMS)&lt;br&gt;" style="sketch=0;html=1;aspect=fixed;strokeColor=none;shadow=0;fillColor=#3B8DF1;verticalAlign=top;labelPosition=center;verticalLabelPosition=bottom;shape=mxgraph.gcp2.lock" vertex="1" parent="1">
+          <mxGeometry x="410" y="230" width="23.4" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-56" value="basic auth/formio" style="sketch=0;html=1;aspect=fixed;strokeColor=none;shadow=0;fillColor=#3B8DF1;verticalAlign=top;labelPosition=center;verticalLabelPosition=bottom;shape=mxgraph.gcp2.lock" vertex="1" parent="1">
+          <mxGeometry x="320" y="170" width="23.4" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-57" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.8;entryY=0.933;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-5" target="TyKP4U4vsr3Walb9-fn5-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-58" value="download csv,&lt;br&gt;list forms" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="TyKP4U4vsr3Walb9-fn5-57">
+          <mxGeometry x="-0.4127" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-67" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-60" target="TyKP4U4vsr3Walb9-fn5-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-68" value="submits" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="TyKP4U4vsr3Walb9-fn5-67">
+          <mxGeometry x="-0.6389" y="3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-60" value="" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.forms.rrect;rSize=0;strokeColor=#999999;fillColor=#ffffff;recursiveResize=0;" vertex="1" parent="1">
+          <mxGeometry x="320" y="550" width="150" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-61" value="Option 1" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.forms.rrect;rSize=0;fillColor=#eeeeee;strokeColor=#999999;gradientColor=#cccccc;align=left;spacingLeft=4;fontSize=17;fontColor=#666666;labelPosition=right;" vertex="1" parent="TyKP4U4vsr3Walb9-fn5-60">
+          <mxGeometry x="8" y="7.5" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-62" value="Option 2" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.forms.rrect;rSize=0;fillColor=#eeeeee;strokeColor=#999999;gradientColor=#cccccc;align=left;spacingLeft=4;fontSize=17;fontColor=#666666;labelPosition=right;" vertex="1" parent="TyKP4U4vsr3Walb9-fn5-60">
+          <mxGeometry x="8" y="37.5" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-63" value="Option 3" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.forms.checkbox;rSize=0;resizable=0;fillColor=#aaaaaa;strokeColor=#444444;gradientColor=#666666;align=left;spacingLeft=4;fontSize=17;fontColor=#008cff;labelPosition=right;" vertex="1" parent="TyKP4U4vsr3Walb9-fn5-60">
+          <mxGeometry x="8" y="67.5" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-64" value="Option 4" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.forms.rrect;rSize=0;fillColor=#eeeeee;strokeColor=#999999;gradientColor=#cccccc;align=left;spacingLeft=4;fontSize=17;fontColor=#666666;labelPosition=right;" vertex="1" parent="TyKP4U4vsr3Walb9-fn5-60">
+          <mxGeometry x="8" y="97.5" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-71" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="400" y="350" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-72" value="technical form.io User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="260" y="20" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-75" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;entryX=0.5;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="TyKP4U4vsr3Walb9-fn5-72">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="275" y="140" as="sourcePoint" />
+            <mxPoint x="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-91" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-76">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="80" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-93" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-76">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="25" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-97" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-76" target="TyKP4U4vsr3Walb9-fn5-90">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-76" value="webhooks" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="-10" y="380" width="70" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-79" value="NodeJs" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="140" y="70" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-84" value="commands" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFCC;" vertex="1" parent="1">
+          <mxGeometry x="370" y="30" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-88" value="commands&lt;br&gt;(find forms,&lt;br&gt;deletes forms&lt;br&gt;migrate forms)&lt;br&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TyKP4U4vsr3Walb9-fn5-85" target="TyKP4U4vsr3Walb9-fn5-84">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-85" value="Developer" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="650" y="20" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-90" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.message;pointerEvents=1;" vertex="1" parent="1">
+          <mxGeometry x="-70" y="536" width="50" height="37.5" as="geometry" />
+        </mxCell>
+        <mxCell id="TyKP4U4vsr3Walb9-fn5-95" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn1.iconfinder.com/data/icons/ui-essential-17/32/UI_Essential_Outline_1_essential-app-ui-question-help-128.png" vertex="1" parent="1">
+          <mxGeometry x="60" y="533.5" width="40" height="40" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
