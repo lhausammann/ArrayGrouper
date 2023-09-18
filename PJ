@@ -1,9 +1,34 @@
-<mxfile host="app.diagrams.net" modified="2023-09-18T10:13:30.706Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" version="21.7.5" etag="TQqSdALRDh1iQtRydAox" type="github">
+<mxfile host="app.diagrams.net" modified="2023-09-18T10:16:26.035Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="1Xil9pn7hKyfkWPslAr9" version="21.7.5" type="github">
   <diagram name="Seite-1" id="DJ6I7EPSGj7dmQRMHIxj">
-    <mxGraphModel>
+    <mxGraphModel dx="975" dy="617" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="s-Z6hCCqrO62n7fXKMFA-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="s-Z6hCCqrO62n7fXKMFA-9" target="s-Z6hCCqrO62n7fXKMFA-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="300" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s-Z6hCCqrO62n7fXKMFA-8" value="Text" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="s-Z6hCCqrO62n7fXKMFA-7">
+          <mxGeometry x="0.2206" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s-Z6hCCqrO62n7fXKMFA-1" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="255" y="480" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s-Z6hCCqrO62n7fXKMFA-2" value="Poll anlegen" style="shape=ellipse;container=1;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;html=1;dashed=0;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="180" y="130" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s-Z6hCCqrO62n7fXKMFA-9" value="CSV exportieren" style="shape=ellipse;container=1;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;html=1;dashed=0;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="180" y="210" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s-Z6hCCqrO62n7fXKMFA-12" value="CMS" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="480" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s-Z6hCCqrO62n7fXKMFA-17" value="Poll anlegen" style="shape=ellipse;container=1;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;html=1;dashed=0;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="180" y="290" width="180" height="70" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
