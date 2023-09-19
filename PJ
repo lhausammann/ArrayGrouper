@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-09-19T07:27:20.554Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="Cx-FILtnvXskOll6215d" version="21.7.5" type="github">
+<mxfile host="app.diagrams.net" modified="2023-09-19T09:10:45.876Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="j4qJ6uZyxXvX9qkVCoNs" version="21.7.5" type="github">
   <diagram name="Seite-1" id="DJ6I7EPSGj7dmQRMHIxj">
     <mxGraphModel dx="1802" dy="1786" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -144,7 +144,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="Xkzj-k41I5iDslx7_Q3E-2" value="Posterjack&lt;br&gt;API (Heroku)" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="Xkzj-k41I5iDslx7_Q3E-2" value="Posterjack&lt;br&gt;API (erweitert, Heroku)" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
           <mxGeometry x="75" y="-140" width="405" height="160" as="geometry" />
         </mxCell>
         <mxCell id="Xkzj-k41I5iDslx7_Q3E-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" edge="1" parent="1">
@@ -157,13 +157,13 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="Xkzj-k41I5iDslx7_Q3E-9" value="Asset URN suchen und kopieren" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="820" y="140" width="90" height="70" as="geometry" />
+          <mxGeometry x="800" y="140" width="90" height="70" as="geometry" />
         </mxCell>
         <mxCell id="Xkzj-k41I5iDslx7_Q3E-19" value="* Polly-Posterjack Auth:&lt;br&gt;entweder by auth Token (server zu server)&lt;br&gt;oder azure API Authentifizierung (analog comments)" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document" vertex="1" parent="1">
           <mxGeometry x="160" y="610" width="280" height="100" as="geometry" />
         </mxCell>
         <mxCell id="Xkzj-k41I5iDslx7_Q3E-20" value="Nora kommuniziert ausschliesslich über Polly mit PJ. (list Endpunkt für Platzierung)&lt;br&gt;Apps teilen sich die Azure Authentifzierung (Polly API). Urns von Assets müssen manuell übertragen werden." style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document" vertex="1" parent="1">
-          <mxGeometry x="600" y="610" width="280" height="100" as="geometry" />
+          <mxGeometry x="580" y="610" width="280" height="100" as="geometry" />
         </mxCell>
         <mxCell id="Xkzj-k41I5iDslx7_Q3E-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" edge="1" parent="1" source="Xkzj-k41I5iDslx7_Q3E-29" target="Xkzj-k41I5iDslx7_Q3E-2">
           <mxGeometry relative="1" as="geometry">
@@ -172,30 +172,43 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="Xkzj-k41I5iDslx7_Q3E-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" target="Xkzj-k41I5iDslx7_Q3E-36">
+        <mxCell id="Xkzj-k41I5iDslx7_Q3E-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="Xkzj-k41I5iDslx7_Q3E-33">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1050" y="80" as="sourcePoint" />
-            <mxPoint x="1022" y="310.0985763184367" as="targetPoint" />
+            <mxPoint x="1026" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Xkzj-k41I5iDslx7_Q3E-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="Xkzj-k41I5iDslx7_Q3E-33" target="Xkzj-k41I5iDslx7_Q3E-36">
+          <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1040" y="80" />
-              <mxPoint x="1040" y="127" />
-              <mxPoint x="1070" y="127" />
+              <mxPoint x="1080" y="510" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="Xkzj-k41I5iDslx7_Q3E-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="Xkzj-k41I5iDslx7_Q3E-33" target="Xkzj-k41I5iDslx7_Q3E-38">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="Xkzj-k41I5iDslx7_Q3E-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="Xkzj-k41I5iDslx7_Q3E-33" target="Xkzj-k41I5iDslx7_Q3E-38">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="950" y="510" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="Xkzj-k41I5iDslx7_Q3E-33" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
-          <mxGeometry x="1010" y="10" width="30" height="60" as="geometry" />
+          <mxGeometry x="1010.5" y="480" width="30" height="60" as="geometry" />
         </mxCell>
         <mxCell id="Xkzj-k41I5iDslx7_Q3E-36" value="participate" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1030" y="170" width="80" height="55" as="geometry" />
+          <mxGeometry x="1040.5" y="170" width="80" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="Xkzj-k41I5iDslx7_Q3E-57" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1.01;entryY=0.417;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;" edge="1" parent="1" source="Xkzj-k41I5iDslx7_Q3E-38" target="dgt-zJ5n8MWrYdV3UGfA-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Xkzj-k41I5iDslx7_Q3E-58" value="assets" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Xkzj-k41I5iDslx7_Q3E-57">
+          <mxGeometry x="0.4971" y="2" relative="1" as="geometry">
+            <mxPoint y="-14" as="offset" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="Xkzj-k41I5iDslx7_Q3E-38" value="render&amp;nbsp;&lt;br&gt;poll" style="ellipse;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
-          <mxGeometry x="940" y="175" width="80" height="50" as="geometry" />
+          <mxGeometry x="940" y="175" width="64" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="Xkzj-k41I5iDslx7_Q3E-46" value="Frontend kommuniziert wie bis anhin mit PJ.&lt;br&gt;Offen ist, wie&amp;nbsp;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document" vertex="1" parent="1">
+        <mxCell id="Xkzj-k41I5iDslx7_Q3E-46" value="Frontend kommuniziert wie bis anhin mit PJ.&lt;br&gt;PJ API. Frontend Rendering muss (ggf) angepasst werden (Assets von Posterjack, mehr Metadaten zu einem Poll)." style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document" vertex="1" parent="1">
           <mxGeometry x="900" y="610" width="280" height="100" as="geometry" />
         </mxCell>
       </root>
