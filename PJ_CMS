@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-09-19T13:55:16.710Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="H6cB_gFk7GDKQiD6AcTr" version="21.7.5" type="github">
+<mxfile host="app.diagrams.net" modified="2023-09-19T13:58:59.936Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="O9RqZPgjYPmOO64Wa4Dv" version="21.7.5" type="github">
   <diagram name="Seite-1" id="r46S9Qj8vkK-vO31ui3K">
     <mxGraphModel dx="975" dy="1786" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -64,6 +64,14 @@
         <mxCell id="FIgCpA_X3wB1dPzzXgh2-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="FIgCpA_X3wB1dPzzXgh2-7" target="FIgCpA_X3wB1dPzzXgh2-15">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="FIgCpA_X3wB1dPzzXgh2-7" target="FIgCpA_X3wB1dPzzXgh2-37">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="120" y="210" />
+              <mxPoint x="120" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
         <mxCell id="FIgCpA_X3wB1dPzzXgh2-7" value="CMS Redaktor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
           <mxGeometry x="50" y="160" width="30" height="60" as="geometry" />
         </mxCell>
@@ -99,7 +107,13 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="FIgCpA_X3wB1dPzzXgh2-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="FIgCpA_X3wB1dPzzXgh2-22" target="FIgCpA_X3wB1dPzzXgh2-31">
-          <mxGeometry relative="1" as="geometry" />
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="325" />
+              <mxPoint x="400" y="-20" />
+              <mxPoint x="473" y="-20" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="FIgCpA_X3wB1dPzzXgh2-22" value="render Poll" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
           <mxGeometry x="220" y="285" width="80" height="80" as="geometry" />
@@ -126,11 +140,14 @@
         <mxCell id="FIgCpA_X3wB1dPzzXgh2-37" value="Assets zu Poll hinzufügen (Bilder, Audio, Video" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="230" y="170" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="FIgCpA_X3wB1dPzzXgh2-45" value="Lösung wie heute:&lt;br&gt;Redaktor legt im CMS einen Poll an, Event wird an PJ geschickt. Alle Assetdaten werden in Nora verwaltet. Render Engine benötigt Posterjack Stammdaten und Asset-Metadaten zu einem Poll.&lt;br&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document" vertex="1" parent="1">
-          <mxGeometry x="20" y="260" width="180" height="130" as="geometry" />
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-45" value="Render Engine benötigt Asset Metadaten und Poll Stammdaten" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document" vertex="1" parent="1">
+          <mxGeometry x="20" y="350" width="180" height="130" as="geometry" />
         </mxCell>
-        <mxCell id="FIgCpA_X3wB1dPzzXgh2-47" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
-          <mxGeometry x="80" y="510" width="30" height="60" as="geometry" />
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-52" value="Redaktor legt Poll in Nora an und verwaltet Assets direkt." style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document" vertex="1" parent="1">
+          <mxGeometry x="20" y="60" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-53" value="keine Anpassungen an bisheriger PJ API nötig." style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document" vertex="1" parent="1">
+          <mxGeometry x="670" y="290" width="150" height="90" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
