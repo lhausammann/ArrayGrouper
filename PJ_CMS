@@ -1,9 +1,79 @@
-<mxfile host="app.diagrams.net" modified="2023-09-19T13:32:09.509Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" version="21.7.5" etag="0ghgr6f4A0WCKAB1yRFX" type="github">
+<mxfile host="app.diagrams.net" modified="2023-09-19T13:40:15.585Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="24bLv3A4z365gh2rhwzi" version="21.7.5" type="github">
   <diagram name="Seite-1" id="r46S9Qj8vkK-vO31ui3K">
-    <mxGraphModel>
+    <mxGraphModel dx="975" dy="617" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.279;entryY=0.18;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;" edge="1" parent="1" source="FIgCpA_X3wB1dPzzXgh2-3" target="FIgCpA_X3wB1dPzzXgh2-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-18" value="API (json)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="FIgCpA_X3wB1dPzzXgh2-16">
+          <mxGeometry x="0.1794" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-3" value="Nora" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="210" y="20" width="250" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-4" value="CMS FE (aron, legacy)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="205" y="270" width="255" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1.004;entryY=0.654;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;" edge="1" parent="1" source="FIgCpA_X3wB1dPzzXgh2-5" target="FIgCpA_X3wB1dPzzXgh2-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-19" value="API Response" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="FIgCpA_X3wB1dPzzXgh2-17">
+          <mxGeometry x="-0.3816" y="2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-5" value="Posterjack API (wie bisher)" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="580" y="135" width="220" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="FIgCpA_X3wB1dPzzXgh2-6" target="FIgCpA_X3wB1dPzzXgh2-22">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="460" />
+              <mxPoint x="260" y="460" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="FIgCpA_X3wB1dPzzXgh2-6" target="FIgCpA_X3wB1dPzzXgh2-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-27" value="POST result" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="FIgCpA_X3wB1dPzzXgh2-26">
+          <mxGeometry x="-0.3143" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-6" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="500" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="FIgCpA_X3wB1dPzzXgh2-7" target="FIgCpA_X3wB1dPzzXgh2-14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="145" y="190" />
+              <mxPoint x="145" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-7" value="CMS Redaktor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="160" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-14" value="Poll erfassen/editieren" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="40" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-15" value="CSV Export" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="170" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-22" value="render Poll" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="220" y="285" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-24" value="save poll results" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="285" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-29" value="Akamai Proxy" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="230" width="120" height="80" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
