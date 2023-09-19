@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-09-19T13:51:39.345Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="r5nEva5w4aA1WDV4uN8V" version="21.7.5" type="github">
+<mxfile host="app.diagrams.net" modified="2023-09-19T13:55:16.710Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="H6cB_gFk7GDKQiD6AcTr" version="21.7.5" type="github">
   <diagram name="Seite-1" id="r46S9Qj8vkK-vO31ui3K">
     <mxGraphModel dx="975" dy="1786" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -78,6 +78,14 @@
         <mxCell id="FIgCpA_X3wB1dPzzXgh2-14" value="Poll erfassen/editieren" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="240" y="30" width="120" height="80" as="geometry" />
         </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.07;entryY=0.4;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;" edge="1" parent="1" source="FIgCpA_X3wB1dPzzXgh2-15" target="FIgCpA_X3wB1dPzzXgh2-5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="195" />
+              <mxPoint x="500" y="195" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
         <mxCell id="FIgCpA_X3wB1dPzzXgh2-15" value="CSV Export" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="350" y="125" width="120" height="80" as="geometry" />
         </mxCell>
@@ -118,8 +126,11 @@
         <mxCell id="FIgCpA_X3wB1dPzzXgh2-37" value="Assets zu Poll hinzufügen (Bilder, Audio, Video" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="230" y="170" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="FIgCpA_X3wB1dPzzXgh2-45" value="Lösung wie heute:&lt;br&gt;Redaktor legt im CMS einen Poll an, Event wird an PJ geschickt. Alle Assetdaten werden in Nora verwaltet." style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document" vertex="1" parent="1">
-          <mxGeometry x="30" y="260" width="170" height="110" as="geometry" />
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-45" value="Lösung wie heute:&lt;br&gt;Redaktor legt im CMS einen Poll an, Event wird an PJ geschickt. Alle Assetdaten werden in Nora verwaltet. Render Engine benötigt Posterjack Stammdaten und Asset-Metadaten zu einem Poll.&lt;br&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document" vertex="1" parent="1">
+          <mxGeometry x="20" y="260" width="180" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="FIgCpA_X3wB1dPzzXgh2-47" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="510" width="30" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
